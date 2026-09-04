@@ -4,84 +4,102 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Daily Desk Dashboard</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#10283a;color:#fff}
-.app{width:100vw;height:100vh;padding:18px;display:grid;grid-template-columns:1.08fr .92fr;grid-template-rows:.86fr 1.14fr;gap:14px;background:#10283a}
-.card{min-width:0;min-height:0;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.30);border-radius:17px;box-shadow:0 7px 26px rgba(0,0,0,.28)}
-.top{background:linear-gradient(120deg,#17374f,#10283a);padding:26px 30px;display:flex;flex-direction:column;justify-content:center}
-.time{font-size:clamp(60px,9.2vw,145px);font-weight:700;line-height:.82;letter-spacing:-5px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#061827;color:#fff}
+.app{width:100vw;height:100vh;padding:18px;position:relative;background:#071b2a url("assets/mountain.jpg") center/cover no-repeat;display:flex;flex-wrap:wrap;align-content:space-between}
+.app:before{content:"";position:absolute;inset:0;background:rgba(2,15,27,.42);pointer-events:none}
+.card{min-width:0;min-height:0;position:relative;overflow:hidden;border:1px solid rgba(205,229,241,.46);border-radius:17px;box-shadow:0 7px 28px rgba(0,0,0,.34)}
+.top,.weather{width:calc(50% - 7px);height:38%}.daily,.stocks{width:calc(50% - 7px);height:56%}
+.top{background:linear-gradient(135deg,rgba(8,36,56,.93),rgba(8,26,42,.82));padding:26px 30px;display:flex;flex-direction:column;justify-content:center}
+.time{font-size:9.2vw;font-weight:700;line-height:.82;letter-spacing:-5px;white-space:nowrap}
 .ampm{font-size:.31em;letter-spacing:0;margin-left:7px}
-.date{font-size:clamp(21px,2.45vw,36px);font-weight:600;margin-top:18px}
-.location{font-size:clamp(16px,1.6vw,24px);margin-top:12px;color:#dce8ef}
-.weather{background:linear-gradient(120deg,#153a53,#0c2536);padding:20px 24px}
-.header{display:flex;justify-content:space-between;align-items:center;font-size:clamp(18px,2vw,28px);font-weight:650}
-.updated{font-size:12px;color:#c2d0d9;font-weight:400}
-.weatherMain{display:grid;grid-template-columns:22% 45% 33%;align-items:center;margin-top:8px}
-.sun{font-size:clamp(42px,4.7vw,70px);text-align:center}
-.temp{font-size:clamp(50px,6.4vw,88px);font-weight:700;line-height:.9}
-.condition{font-size:clamp(15px,1.7vw,23px);margin-top:5px}
-.highlow{font-size:clamp(13px,1.3vw,18px);line-height:1.65;color:#dce6eb}
-.forecast{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid rgba(255,255,255,.22);margin-top:13px;padding-top:9px}
+.date{font-size:2.45vw;font-weight:600;margin-top:18px;white-space:nowrap}
+.motto{font-size:15px;margin-top:22px;padding-top:12px;border-top:1px solid rgba(255,255,255,.24);color:#a9d4eb;text-align:center;letter-spacing:.3px}
+.weather{background:linear-gradient(135deg,rgba(7,42,64,.94),rgba(7,27,43,.88));padding:18px 22px}
+.header{display:flex;justify-content:space-between;align-items:center;font-size:2vw;font-weight:650}
+.place{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px}
+.pin{font-size:.9em;margin-right:5px}
+.updated{font-size:12px;color:#c2d0d9;font-weight:400;white-space:nowrap}
+.weatherMain{display:flex;align-items:center;margin-top:8px}.weatherMain .sun{width:22%}.weatherMain>div:nth-child(2){width:45%}.weatherMain .highlow{width:33%}
+.sun{font-size:4.7vw;text-align:center}
+.temp{font-size:6.4vw;font-weight:700;line-height:.9}
+.condition{font-size:1.7vw;margin-top:5px}
+.highlow{font-size:1.3vw;line-height:1.65;color:#dce6eb}
+.forecast{display:flex;border-top:1px solid rgba(255,255,255,.22);margin-top:13px;padding-top:9px}.fc{width:20%}
 .fc{text-align:center;font-size:12px;color:#d8e3e9}.fc b{display:block;color:#fff;margin-bottom:3px}.fc i{display:block;font-style:normal;font-size:23px;margin-bottom:2px}
-.daily{background:#17364b url("daily-nature.png") center/cover no-repeat}
-.daily:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,20,32,.94) 0%,rgba(4,20,32,.82) 48%,rgba(4,20,32,.38) 100%)}
+.daily{background:#102d41 center/cover no-repeat}
+.daily:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,17,29,.93) 0%,rgba(3,17,29,.78) 50%,rgba(3,17,29,.40) 100%)}
 .dailyInner{position:relative;z-index:1;height:100%;padding:23px 27px;display:flex;flex-direction:column}
 .dailyDate{font-size:13px;letter-spacing:1.6px;text-transform:uppercase;color:#e0e9ee}
-.scripture{font-family:Georgia,"Times New Roman",serif;font-size:clamp(21px,2.15vw,31px);font-style:italic;line-height:1.23;margin-top:13px;max-width:95%;text-shadow:0 2px 5px rgba(0,0,0,.9)}
+.rule{height:1px;width:42%;background:rgba(255,255,255,.72);margin-top:10px}
+.scripture{font-family:Georgia,"Times New Roman",serif;font-size:2.15vw;font-style:italic;line-height:1.23;margin-top:13px;max-width:94%;text-shadow:0 2px 5px rgba(0,0,0,.9)}
 .ref{font-size:14px;margin-top:5px;color:#e3edf2}
-.comment{font-size:clamp(14px,1.35vw,19px);line-height:1.4;margin-top:13px;max-width:95%;text-shadow:0 1px 4px #000;overflow:hidden}
-.read{margin-top:auto;align-self:flex-start;border:1px solid rgba(255,255,255,.75);background:rgba(8,25,38,.42);color:#fff;border-radius:9px;padding:8px 14px;font-size:14px}
-.stocks{background:linear-gradient(120deg,#183a4f,#0e2738);padding:21px 24px}
-.stockTitle{display:flex;justify-content:space-between;align-items:center;font-size:clamp(20px,2.2vw,30px);font-weight:700}
+.comment{font-size:1.35vw;line-height:1.4;margin-top:13px;max-width:95%;text-shadow:0 1px 4px #000;overflow:hidden}
+.read{margin-top:auto;align-self:flex-start;border:1px solid rgba(255,255,255,.76);background:rgba(5,23,36,.55);color:#fff;border-radius:9px;padding:9px 15px;font-size:14px;cursor:pointer}
+.stocks{background:linear-gradient(135deg,rgba(16,48,65,.94),rgba(7,28,43,.90));padding:21px 24px}
+.stockTitle{display:flex;justify-content:space-between;align-items:center;font-size:2.2vw;font-weight:700}
 .stockTable{margin-top:11px}
-.stockHead,.stockRow{display:grid;grid-template-columns:21% 25% 28% 26%;align-items:center}
+.stockHead,.stockRow{display:flex;align-items:center}.stockHead span:nth-child(1),.stockRow b{width:21%}.stockHead span:nth-child(2),.stockRow .price{width:25%}.stockHead span:nth-child(3),.stockRow .change{width:28%}.stockHead span:nth-child(4),.stockRow .pct{width:26%}
 .stockHead{font-size:12px;color:#bdcbd4;border-bottom:1px solid rgba(255,255,255,.23);padding:7px 0}
-.stockRow{font-size:clamp(14px,1.4vw,20px);padding:7px 0;border-bottom:1px solid rgba(255,255,255,.13)}
+.stockRow{font-size:1.4vw;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.13)}
 .stockRow b{font-size:1.03em}.right{text-align:right}.up{color:#35ed78}.down{color:#ff6262}
-.controls{position:absolute;right:18px;bottom:15px;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:6px 11px;font-size:13px}
-.modal{display:none;position:fixed;z-index:20;inset:0;background:rgba(0,0,0,.68);align-items:center;justify-content:center}
-.modalBox{width:min(460px,90vw);background:#183448;border:1px solid #7892a1;border-radius:15px;padding:22px;color:#fff}
+.controls{position:absolute;right:18px;bottom:15px;border:1px solid rgba(255,255,255,.58);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:7px 13px;font-size:13px;cursor:pointer}
+.footer{position:absolute;left:34px;right:34px;bottom:12px;z-index:2;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.9);font-size:13px;text-shadow:0 2px 5px #000}
+.status{font-size:13px}
+.modal{display:none;position:fixed;z-index:20;inset:0;background:rgba(0,0,0,.72);align-items:center;justify-content:center}
+.modalBox{width:460px;max-width:90vw;background:#183448;border:1px solid #7892a1;border-radius:15px;padding:22px;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .modalBox h2{margin:0 0 12px}.modalBox p{color:#cfdae0;font-size:14px}
 #symbols{width:100%;padding:10px;border-radius:8px;border:1px solid #8296a1;background:#0c2332;color:#fff;font-size:16px}
 .modalBtns{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.modalBtns button{padding:8px 14px;border-radius:8px;border:1px solid #91a5af;background:#27485b;color:#fff}
 @media(max-width:700px){
-  html,body{overflow:auto}.app{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:24vh 27vh 39vh 34vh;padding:10px;gap:10px}
-  .top{padding:18px}.time{font-size:clamp(55px,16vw,90px)}.date{font-size:clamp(18px,5vw,26px)}
-  .weather{padding:15px}.dailyInner{padding:18px}.stocks{padding:17px}
+ html,body{overflow:auto}
+ .app{height:auto;min-height:100vh;display:block;padding:10px}
+ .top,.weather,.daily,.stocks{width:100%;height:auto} .top{height:220px;padding:18px}.time{font-size:68px}.date{font-size:22px;white-space:normal}.motto{margin-top:15px}
+ .weather{padding:15px}.header{font-size:21px}.weatherMain .sun{width:20%}.weatherMain>div:nth-child(2){width:48%}.weatherMain .highlow{width:32%}.sun{font-size:48px}.temp{font-size:60px}.highlow{font-size:14px}
+ .dailyInner{padding:18px}.scripture{font-size:24px}.comment{font-size:15px}
+ .stocks{padding:17px}.stockRow{font-size:17px}
+ .footer{position:static;padding:4px 6px 10px;margin-top:-4px}
+}
+@media(max-width:430px){
+ .app{padding:8px} .top{height:190px}.weather{height:230px}.daily{height:390px}.stocks{height:330px}
+ .time{font-size:58px;letter-spacing:-3px}.date{font-size:19px}.weatherMain .sun{width:18%}.weatherMain>div:nth-child(2){width:48%}.weatherMain .highlow{width:34%}.temp{font-size:52px}.condition{font-size:14px}.highlow{font-size:12px}.forecast{margin-top:8px}.fc{font-size:10px}.fc i{font-size:20px}.scripture{font-size:22px}.comment{font-size:14px}
 }
 </style>
 </head>
 <body>
-<div class="app">
-<section class="card top"><div class="time" id="clock">--:-- <span class="ampm">--</span></div><div class="date" id="date">Loading date...</div><div class="location" id="location">📍 Finding your location…</div></section>
+<div class="app" id="app">
+<section class="card top"><div class="time" id="clock">--:-- <span class="ampm">--</span></div><div class="date" id="date">Loading date...</div><div class="motto">A Better Day Ahead</div></section>
 
 <section class="card weather">
-<div class="header"><span id="weatherPlace">📍 Weather</span><span class="updated" id="weatherUpdated"></span></div>
-<div class="weatherMain"><div class="sun" id="weatherIcon">☀️</div><div><div class="temp" id="temp">--°</div><div class="condition" id="condition">Loading…</div></div><div class="highlow" id="highlow">High: --<br>Low: --</div></div>
+<div class="header"><span class="place" id="weatherPlace"><span class="pin">●</span> Finding location…</span><span class="updated" id="weatherUpdated"></span></div>
+<div class="weatherMain"><div class="sun" id="weatherIcon">☀️</div><div><div class="temp" id="temp">--°</div><div class="condition" id="condition">Loading…</div></div><div class="highlow" id="highlow">Feels Like: --<br>High: --<br>Low: --</div></div>
 <div class="forecast" id="forecast"></div>
 </section>
 
-<section class="card daily">
+<section class="card daily" id="dailyCard">
 <div class="dailyInner">
-<div class="dailyDate" id="dailyDate">September 4, 2026</div>
+<div class="dailyDate" id="dailyDate">September 4, 2026</div><div class="rule"></div>
 <div class="scripture" id="scripture">“Jehovah detests a devious person, but His close friendship is with the upright.”</div>
 <div class="ref">— Proverbs 3:32</div>
 <div class="comment" id="comment">We can learn about the importance of having a sincere heart from Jesus’ first meeting with Nathanael. Although Jesus had never met Nathanael, Jesus said: “See, truly an Israelite in whom there is no deceit.” Jesus admired Nathanael’s sincerity and commended him for it. Psalm 15 shows that pleasing Jehovah includes treating others well and avoiding speech that harms them.</div>
-<button class="read" id="readDaily">Read Today's Complete Text&nbsp; ›</button>
+<button class="read" id="readDaily">▣ &nbsp; Read Today's Complete Text&nbsp; ›</button>
 </div>
 </section>
 
 <section class="card stocks">
-<div class="stockTitle"><span>📈 My Stocks</span><span class="updated" id="stockUpdated"></span></div>
+<div class="stockTitle"><span>▮▮ My Stocks</span><span class="updated" id="stockUpdated"></span></div>
 <div class="stockTable">
 <div class="stockHead"><span>Symbol</span><span class="right">Price</span><span class="right">Change</span><span class="right">% Change</span></div>
 <div id="stockRows"></div>
 </div>
-<button class="controls" id="editStocks">⚙ Edit Stocks</button>
+<button class="controls" id="editStocks">⚙ &nbsp; Edit Stocks</button>
 </section>
+
+<div class="footer"><span>Simple Information. A Better Day.</span><span class="status">Wi‑Fi &nbsp;&nbsp; 100% ▰</span></div>
 </div>
 
 <div class="modal" id="stockModal"><div class="modalBox">
@@ -91,7 +109,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 </div></div>
 
 <script>
-/* Written in older-style JavaScript for better compatibility with older iPad Safari. */
 (function(){
 var defaultSymbols=["AAPL","MSFT","NVDA","AMZN","TSLA","GOOG"];
 var symbols;
@@ -100,7 +117,7 @@ if(!symbols||!symbols.length)symbols=defaultSymbols;
 
 function pad(n){return n<10?"0"+n:n}
 function updateClock(){
- var d=new Date(), h=d.getHours(), m=d.getMinutes(), s=d.getSeconds(), ap=h>=12?"PM":"AM";
+ var d=new Date(), h=d.getHours(), m=d.getMinutes(), ap=h>=12?"PM":"AM";
  h=h%12;if(h===0)h=12;
  document.getElementById("clock").innerHTML=h+":"+pad(m)+" <span class='ampm'>"+ap+"</span>";
  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -121,50 +138,59 @@ function weatherText(code){
 function xhr(url,ok,fail){
  var x=new XMLHttpRequest();x.onreadystatechange=function(){if(x.readyState===4){if(x.status>=200&&x.status<300){try{ok(JSON.parse(x.responseText))}catch(e){if(fail)fail()}}else if(fail)fail()}};x.open("GET",url,true);x.send();
 }
+function setPlace(city,state){
+ var label=city||"Current Location"; if(state)label+=", "+state;
+ document.getElementById("weatherPlace").innerHTML="<span class='pin'>●</span> "+label;
+}
 function loadWeather(lat,lon){
  var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+
  "&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto&forecast_days=5";
  xhr(url,function(d){
-  var c=d.current, w=weatherText(c.weather_code), days=d.daily;
+  var c=d.current,w=weatherText(c.weather_code),days=d.daily;
   document.getElementById("temp").innerHTML=Math.round(c.temperature_2m)+"°";
   document.getElementById("condition").innerHTML=w[1];
   document.getElementById("weatherIcon").innerHTML=w[0];
   document.getElementById("highlow").innerHTML="Feels Like: "+Math.round(c.apparent_temperature)+"°<br>High: "+Math.round(days.temperature_2m_max[0])+"°<br>Low: "+Math.round(days.temperature_2m_min[0])+"°";
-  var out="", i, dt, dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  var out="",i,dt,dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   for(i=0;i<days.time.length;i++){dt=new Date(days.time[i]+"T12:00:00");var wi=weatherText(days.weather_code[i]);out+="<div class='fc'><b>"+dayNames[dt.getDay()]+"</b><i>"+wi[0]+"</i>"+Math.round(days.temperature_2m_max[i])+"° / "+Math.round(days.temperature_2m_min[i])+"°</div>"}
   document.getElementById("forecast").innerHTML=out;
   document.getElementById("weatherUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
- },function(){
-  document.getElementById("condition").innerHTML="Weather unavailable";
- });
+ },function(){document.getElementById("condition").innerHTML="Weather unavailable"});
 }
 function locate(){
- if(navigator.geolocation){
-  navigator.geolocation.getCurrentPosition(function(p){
-   loadWeather(p.coords.latitude,p.coords.longitude);
-   /* A lightweight reverse-geocoding request gives a friendly city name. */
-   xhr("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent("Carlisle")+"&count=1&language=en&format=json",function(){});
-  },function(){document.getElementById("location").innerHTML="📍 Location permission not granted";});
- }else document.getElementById("location").innerHTML="📍 Location not supported";
+ if(!navigator.geolocation){setPlace("Current Location","");return;}
+ navigator.geolocation.getCurrentPosition(function(p){
+  loadWeather(p.coords.latitude,p.coords.longitude);
+  var rurl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+p.coords.latitude+"&longitude="+p.coords.longitude+"&localityLanguage=en";
+  xhr(rurl,function(d){
+   var city=d.city||d.locality||d.principalSubdivision||"Current Location";
+   var state=d.principalSubdivisionCode||"";
+   if(state.indexOf("-")>=0)state=state.split("-")[1];
+   if(!state && d.principalSubdivision)state=d.principalSubdivision.length<=3?d.principalSubdivision:"";
+   setPlace(city,state);
+  },function(){setPlace("Current Location","")});
+ },function(){setPlace("Location unavailable","")});
 }
 locate();
+
+/* Rotate among dark, readable scene types. The images are local so the dashboard remains usable offline. */
+var scenes=["assets/mountain.jpg","assets/ocean.jpg","assets/space.jpg"];
+var scene=scenes[Math.floor(Math.random()*scenes.length)];
+document.getElementById("dailyCard").style.backgroundImage="url('"+scene+"')";
 
 function renderStocks(){
  var html="",i;
  for(i=0;i<symbols.length;i++){
-  var s=String(symbols[i]).toUpperCase().replace(/[^A-Z0-9.\-]/g,"");
-  if(!s)continue;
+  var s=String(symbols[i]).toUpperCase().replace(/[^A-Z0-9.\-]/g,""); if(!s)continue;
   html+="<div class='stockRow' data-symbol='"+s+"'><b>"+s+"</b><span class='right price'>--</span><span class='right change'>--</span><span class='right pct'>--</span></div>";
  }
  document.getElementById("stockRows").innerHTML=html;
 }
 function loadOneStock(s,row){
- /* Yahoo's chart endpoint is used when available; the row keeps a clean fallback if blocked. */
  xhr("https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(s)+"?range=1d&interval=1m",function(d){
   var r=d.chart&&d.chart.result&&d.chart.result[0];if(!r)return;
-  var q=r.meta||{}, price=q.regularMarketPrice, prev=q.chartPreviousClose;
-  if(price==null||prev==null)return;
-  var ch=price-prev,pct=(ch/prev)*100, up=ch>=0;
+  var q=r.meta||{},price=q.regularMarketPrice,prev=q.chartPreviousClose;if(price==null||prev==null)return;
+  var ch=price-prev,pct=(ch/prev)*100,up=ch>=0;
   row.querySelector(".price").innerHTML=price.toFixed(2);
   row.querySelector(".change").innerHTML=(up?"▲ +":"▼ -")+Math.abs(ch).toFixed(2);
   row.querySelector(".pct").innerHTML=(up?"+":"-")+Math.abs(pct).toFixed(2)+"%";
@@ -178,14 +204,13 @@ function refreshStocks(){
  for(i=0;i<rows.length;i++)loadOneStock(rows[i].getAttribute("data-symbol"),rows[i]);
  document.getElementById("stockUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
 }
-refreshStocks();
-setInterval(refreshStocks,300000);
+refreshStocks();setInterval(refreshStocks,300000);
 
 document.getElementById("editStocks").onclick=function(){document.getElementById("symbols").value=symbols.join(",");document.getElementById("stockModal").style.display="flex"};
 document.getElementById("cancelStocks").onclick=function(){document.getElementById("stockModal").style.display="none"};
 document.getElementById("saveStocks").onclick=function(){
- var a=document.getElementById("symbols").value.split(","), clean=[],i,s;
- for(i=0;i<a.length;i++){s=a[i].replace(/^\s+|\s+$/g,"").toUpperCase();if(s&&!clean.length===false){} if(s&&clean.indexOf(s)<0)clean.push(s)}
+ var a=document.getElementById("symbols").value.split(","),clean=[],i,s;
+ for(i=0;i<a.length;i++){s=a[i].replace(/^\s+|\s+$/g,"").toUpperCase();if(s&&clean.indexOf(s)<0)clean.push(s)}
  if(clean.length){symbols=clean;try{localStorage.setItem("deskStocks",JSON.stringify(symbols))}catch(e){}refreshStocks()}
  document.getElementById("stockModal").style.display="none";
 };
