@@ -36,9 +36,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .rule{height:1px;width:42%;background:rgba(255,255,255,.72);margin-top:10px}
 .scripture{font-family:Georgia,"Times New Roman",serif;font-size:2.55vw;font-style:italic;line-height:1.2;margin-top:13px;max-width:96%;text-shadow:0 2px 5px rgba(0,0,0,.95)}
 .ref{font-size:14px;margin-top:5px;color:#e3edf2}
-.comment{font-size:1.05vw;line-height:1.45;margin-top:12px;max-width:91%;color:rgba(255,255,255,.78);text-shadow:0 1px 4px #000;overflow:hidden}
+.comment{font-size:1.05vw;line-height:1.45;margin-top:12px;max-width:91%;color:rgba(255,255,255,.72);text-shadow:0 1px 4px #000;overflow:auto;flex:1;min-height:0;padding-right:8px}
 .photoBtn{position:absolute;right:14px;bottom:12px;z-index:3;border:1px solid rgba(255,255,255,.55);background:rgba(4,20,31,.62);color:#fff;border-radius:7px;padding:6px 9px;font-size:12px;cursor:pointer}.photoInput{display:none}
-.read{margin-top:auto;align-self:flex-start;border:1px solid rgba(255,255,255,.76);background:rgba(5,23,36,.55);color:#fff;border-radius:9px;padding:9px 15px;font-size:14px;cursor:pointer}
 .stocks{background:linear-gradient(135deg,rgba(16,48,65,.94),rgba(7,28,43,.90));padding:21px 24px}
 .stockTitle{display:flex;justify-content:space-between;align-items:center;font-size:2.2vw;font-weight:700}
 .stockTable{margin-top:11px}
@@ -59,13 +58,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
  .app{height:auto;min-height:100vh;display:block;padding:10px}
  .top,.weather,.daily,.stocks{width:100%;height:auto} .top{height:220px;padding:18px}.time{font-size:68px}.date{font-size:22px;white-space:normal}
  .weather{padding:15px}.header{font-size:21px}.weatherMain .sun{width:20%}.weatherMain>div:nth-child(2){width:48%}.weatherMain .highlow{width:32%}.sun{font-size:48px}.temp{font-size:60px}.highlow{font-size:14px}
- .dailyInner{padding:18px}.scripture{font-size:27px}.comment{font-size:13px}
+ .dailyInner{padding:18px}.scripture{font-size:27px}.comment{font-size:13px;flex:1;min-height:0;overflow:auto}
  .stocks{padding:17px}.stockRow{font-size:17px}
  .footer{position:static;padding:4px 6px 10px;margin-top:-4px}
 }
 @media(max-width:430px){
  .app{padding:8px} .top{height:190px}.weather{height:230px}.daily{height:390px}.stocks{height:330px}
- .time{font-size:58px;letter-spacing:-3px}.date{font-size:19px}.weatherMain .sun{width:18%}.weatherMain>div:nth-child(2){width:48%}.weatherMain .highlow{width:34%}.temp{font-size:52px}.condition{font-size:14px}.highlow{font-size:12px}.forecast{margin-top:8px}.fc{font-size:10px}.fc i{font-size:20px}.scripture{font-size:22px}.comment{font-size:14px}
+ .time{font-size:58px;letter-spacing:-3px}.date{font-size:19px}.weatherMain .sun{width:18%}.weatherMain>div:nth-child(2){width:48%}.weatherMain .highlow{width:34%}.temp{font-size:52px}.condition{font-size:14px}.highlow{font-size:12px}.forecast{margin-top:8px}.fc{font-size:10px}.fc i{font-size:20px}.scripture{font-size:22px}.comment{font-size:14px;flex:1;min-height:0;overflow:auto}
 }
 </style>
 </head>
@@ -84,8 +83,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 <div class="dailyDate" id="dailyDate">September 4, 2026</div><div class="rule"></div>
 <div class="scripture" id="scripture">“Jehovah detests a devious person, but His close friendship is with the upright.”</div>
 <div class="ref">— Proverbs 3:32</div>
-<div class="comment" id="comment">We can learn about the importance of having a sincere heart from Jesus’ first meeting with Nathanael. Although Jesus had never met Nathanael, Jesus said: “See, truly an Israelite in whom there is no deceit.” Jesus admired Nathanael’s sincerity and commended him for it. Psalm 15 shows that pleasing Jehovah includes treating others well and avoiding speech that harms them.</div>
-<button class="read" id="readDaily">▣ &nbsp; Read Today's Complete Text&nbsp; ›</button>
+<div class="comment" id="comment">We can learn about the importance of having a sincere heart from Jesus’ first meeting with Nathanael. When Philip brought his friend Nathanael to meet Jesus, something remarkable happened. Although Jesus had never met Nathanael, Jesus said: “See, truly an Israelite in whom there is no deceit.” (John 1:47) Jesus saw in Nathanael an extraordinary sincerity. Like us, Nathanael was imperfect. But there was nothing artificial or insincere about him. Jesus admired that and commended Nathanael for it. Most of the requirements for pleasing Jehovah listed in Psalm 15 are related to how we treat others. Psalm 15:3 states that a guest in Jehovah’s tent “does not slander with his tongue, he does nothing bad to his neighbor, and he does not defame his friends.” Misusing our speech in such ways could cause serious harm to others.—Jas. 1:26. w24.06 10 ¶7, 9; 11 ¶10</div>
 <button class="photoBtn" id="choosePhoto">▧ &nbsp; Change Picture</button>
 <input class="photoInput" id="photoInput" type="file" accept="image/*">
 </div>
@@ -238,7 +236,6 @@ document.getElementById("saveStocks").onclick=function(){
  if(clean.length){symbols=clean;try{localStorage.setItem("deskStocks",JSON.stringify(symbols))}catch(e){}refreshStocks()}
  document.getElementById("stockModal").style.display="none";
 };
-document.getElementById("readDaily").onclick=function(){window.open("https://wol.jw.org/en/wol/h/r1/lp-e/2026/9/4","_blank")};
 })();
 </script>
 </body>
