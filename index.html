@@ -18,7 +18,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .time{font-size:9.2vw;font-weight:700;line-height:.82;letter-spacing:-5px;white-space:nowrap}
 .ampm{font-size:.31em;letter-spacing:0;margin-left:7px}
 .date{font-size:2.45vw;font-weight:600;margin-top:18px;white-space:nowrap}
-.motto{font-size:15px;margin-top:22px;padding-top:12px;border-top:1px solid rgba(255,255,255,.24);color:#a9d4eb;text-align:center;letter-spacing:.3px}
 .weather{background:linear-gradient(135deg,rgba(7,42,64,.94),rgba(7,27,43,.88));padding:18px 22px}
 .header{display:flex;justify-content:space-between;align-items:center;font-size:2vw;font-weight:650}
 .place{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px}
@@ -36,9 +35,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 .dailyInner{position:relative;z-index:1;height:100%;padding:23px 27px;display:flex;flex-direction:column}
 .dailyDate{font-size:13px;letter-spacing:1.6px;text-transform:uppercase;color:#e0e9ee}
 .rule{height:1px;width:42%;background:rgba(255,255,255,.72);margin-top:10px}
-.scripture{font-family:Georgia,"Times New Roman",serif;font-size:2.15vw;font-style:italic;line-height:1.23;margin-top:13px;max-width:94%;text-shadow:0 2px 5px rgba(0,0,0,.9)}
+.scripture{font-family:Georgia,"Times New Roman",serif;font-size:2.55vw;font-style:italic;line-height:1.2;margin-top:13px;max-width:96%;text-shadow:0 2px 5px rgba(0,0,0,.95)}
 .ref{font-size:14px;margin-top:5px;color:#e3edf2}
-.comment{font-size:1.35vw;line-height:1.4;margin-top:13px;max-width:95%;text-shadow:0 1px 4px #000;overflow:hidden}
+.comment{font-size:1.05vw;line-height:1.45;margin-top:12px;max-width:91%;color:rgba(255,255,255,.78);text-shadow:0 1px 4px #000;overflow:hidden}
 .read{margin-top:auto;align-self:flex-start;border:1px solid rgba(255,255,255,.76);background:rgba(5,23,36,.55);color:#fff;border-radius:9px;padding:9px 15px;font-size:14px;cursor:pointer}
 .stocks{background:linear-gradient(135deg,rgba(16,48,65,.94),rgba(7,28,43,.90));padding:21px 24px}
 .stockTitle{display:flex;justify-content:space-between;align-items:center;font-size:2.2vw;font-weight:700}
@@ -58,9 +57,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 @media(max-width:700px){
  html,body{overflow:auto}
  .app{height:auto;min-height:100vh;display:block;padding:10px}
- .top,.weather,.daily,.stocks{width:100%;height:auto} .top{height:220px;padding:18px}.time{font-size:68px}.date{font-size:22px;white-space:normal}.motto{margin-top:15px}
+ .top,.weather,.daily,.stocks{width:100%;height:auto} .top{height:220px;padding:18px}.time{font-size:68px}.date{font-size:22px;white-space:normal}
  .weather{padding:15px}.header{font-size:21px}.weatherMain .sun{width:20%}.weatherMain>div:nth-child(2){width:48%}.weatherMain .highlow{width:32%}.sun{font-size:48px}.temp{font-size:60px}.highlow{font-size:14px}
- .dailyInner{padding:18px}.scripture{font-size:24px}.comment{font-size:15px}
+ .dailyInner{padding:18px}.scripture{font-size:27px}.comment{font-size:13px}
  .stocks{padding:17px}.stockRow{font-size:17px}
  .footer{position:static;padding:4px 6px 10px;margin-top:-4px}
 }
@@ -72,7 +71,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;ba
 </head>
 <body>
 <div class="app" id="app">
-<section class="card top"><div class="time" id="clock">--:-- <span class="ampm">--</span></div><div class="date" id="date">Loading date...</div><div class="motto">A Better Day Ahead</div></section>
+<section class="card top"><div class="time" id="clock">--:-- <span class="ampm">--</span></div><div class="date" id="date">Loading date...</div></section>
 
 <section class="card weather">
 <div class="header"><span class="place" id="weatherPlace"><span class="pin">●</span> Finding location…</span><span class="updated" id="weatherUpdated"></span></div>
