@@ -9,67 +9,55 @@
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#000;color:#f2f6fb;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
-body{min-height:100vh}
-.wrap{width:100%;max-width:1200px;margin:0 auto;padding:18px}
-.row{display:flex;flex-wrap:wrap;margin:-8px}
-.card{position:relative;margin:8px;background:#081a2d;border:1px solid rgba(160,195,225,.35);border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden;min-height:270px}
-.half{width:calc(50% - 16px)}
-.pad{padding:28px}
-.label{font-size:16px;letter-spacing:3px;color:#aebed0;margin-bottom:24px}
-.bigtime{font-size:72px;line-height:1;font-weight:300;letter-spacing:1px}
-.ampm{font-size:22px;font-weight:600;vertical-align:middle;margin-left:8px;letter-spacing:1px}
-.date{font-size:25px;color:#dce6f0;margin-top:24px}
-.place{font-size:30px;margin-top:6px}
-.temp{font-size:58px;font-weight:300;position:absolute;right:28px;top:58px}
-.weatherline{font-size:24px;color:#dbe5ef;margin-top:8px}
-.weathericon{font-size:38px;margin-top:18px}
-.details{font-size:17px;line-height:1.65;color:#c8d4df;margin-top:14px}
-.forecast{display:flex;flex-wrap:wrap;margin-top:18px}
-.fc{font-size:13px;text-align:center;color:#cbd7e2;min-width:72px;margin-right:10px;margin-bottom:8px}
-.fc i{display:block;font-style:normal;font-size:24px;margin:4px 0}
-.updated{font-size:12px;color:#8193a5;margin-top:10px}
-.daily{background-position:center;background-size:cover;background-repeat:no-repeat}
-.daily:before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,12,21,.45),rgba(3,12,21,.78));pointer-events:none}
-.dailyContent{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
-.dailyDate{font-size:18px;color:#d1dce7;margin-bottom:18px}
-.scripture{font-size:28px;line-height:1.28;font-weight:500}
-.ref{font-size:20px;color:#d4e0eb;margin-top:10px}
-.comment{font-size:16px;line-height:1.55;color:#d0dae4;margin-top:18px;overflow:auto;-webkit-overflow-scrolling:touch;max-height:210px;padding-right:5px}
-.change{position:absolute;right:18px;bottom:16px;z-index:3;background:rgba(5,18,32,.82);border:1px solid rgba(190,215,235,.4);border-radius:10px;color:#eef5fb;padding:9px 12px;font-size:13px}
-.stockRows{margin-top:4px}
-.stockRow{display:flex;align-items:center;border-bottom:1px solid rgba(180,205,225,.13);padding:11px 0;font-size:16px}
-.stockRow b{width:70px}
-.stockRow span{display:block;text-align:right}
-.price{width:80px}
-.changeCol{width:85px}
-.pct{width:72px}
-.up{color:#77d69a}.down{color:#ff8e8e}
-.edit{margin-top:14px;background:rgba(70,120,165,.25);border:1px solid rgba(190,215,235,.35);border-radius:9px;color:#eef5fb;padding:8px 12px}
-.footer{text-align:center;color:#5f7387;font-size:12px;padding:8px 0 18px}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:20;align-items:center;justify-content:center}
-.modalBox{background:#0b1c2e;border:1px solid rgba(180,210,235,.4);border-radius:16px;padding:22px;width:90%;max-width:460px}
-.modalBox h2{margin-top:0}
-.modalBox input{width:100%;padding:12px;border-radius:8px;border:1px solid #587087;background:#061322;color:#fff;font-size:17px}
-.modalBtns{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
-.modalBtns button{padding:9px 14px;border-radius:8px;border:1px solid #587087;background:#10263b;color:#fff}
+body{min-height:100vh;overflow:hidden}
+.wrap{width:100%;max-width:1200px;height:100vh;margin:0 auto;padding:12px;display:flex;flex-direction:column}
+.topRow{display:flex;flex:0 0 32%;min-height:210px;margin:-6px}
+.card{position:relative;margin:6px;background:#081a2d;border:1px solid rgba(160,195,225,.35);border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
+.half{width:50%}
+.pad{padding:24px}
+.label{font-size:15px;letter-spacing:3px;color:#aebed0;margin-bottom:18px}
+.bigtime{font-size:68px;line-height:1;font-weight:300;letter-spacing:1px}
+.ampm{font-size:21px;font-weight:600;vertical-align:middle;margin-left:7px;letter-spacing:1px}
+.date{font-size:23px;color:#dce6f0;margin-top:18px}
+.place{font-size:28px;margin-top:4px}
+.temp{font-size:50px;font-weight:300;position:absolute;right:24px;top:48px}
+.weatherline{font-size:22px;color:#dbe5ef;margin-top:7px}
+.weathericon{font-size:34px;margin-top:12px}
+.details{font-size:16px;line-height:1.5;color:#c8d4df;margin-top:10px}
+.forecast{display:flex;flex-wrap:wrap;margin-top:12px}
+.fc{font-size:12px;text-align:center;color:#cbd7e2;min-width:65px;margin-right:8px;margin-bottom:6px}
+.fc i{display:block;font-style:normal;font-size:21px;margin:3px 0}
+.updated{font-size:11px;color:#8193a5;margin-top:7px}
+.daily{flex:1 1 auto;width:100%;min-height:0;background-position:center;background-size:cover;background-repeat:no-repeat;margin-top:6px}
+.daily:before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:linear-gradient(rgba(3,12,21,.42),rgba(3,12,21,.78));pointer-events:none}
+.dailyContent{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;min-height:0}
+.dailyDate{font-size:18px;color:#d1dce7;margin-bottom:14px}
+.scripture{font-size:30px;line-height:1.3;font-weight:500;max-width:1000px}
+.ref{font-size:19px;color:#d4e0eb;margin-top:8px}
+.comment{font-size:17px;line-height:1.55;color:#d0dae4;margin-top:16px;overflow:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;padding-right:8px}
+.change{position:absolute;right:18px;bottom:16px;z-index:3;background:rgba(5,18,32,.82);border:1px solid rgba(190,215,235,.4);border-radius:10px;color:#eef5fb;padding:8px 11px;font-size:13px}
+.footer{text-align:center;color:#5f7387;font-size:11px;padding:5px 0 4px;flex:0 0 auto}
 @media(max-width:760px){
- .wrap{padding:8px}
- .half{width:calc(100% - 16px)}
- .card{min-height:260px;border-radius:20px}
- .pad{padding:24px}
- .bigtime{font-size:58px}
- .date{font-size:22px}
- .place{font-size:27px}
- .temp{font-size:48px;right:24px}
- .scripture{font-size:25px}
- .comment{max-height:220px}
+ body{overflow:auto}
+ .wrap{height:auto;min-height:100vh;padding:7px}
+ .topRow{display:flex;flex-direction:column;flex:0 0 auto;margin:-4px}
+ .half{width:100%}
+ .card{margin:4px;border-radius:18px}
+ .topRow .card{min-height:205px}
+ .pad{padding:20px}
+ .bigtime{font-size:55px}
+ .date{font-size:21px}
+ .place{font-size:25px}
+ .temp{font-size:45px;right:20px;top:45px}
+ .daily{height:calc(100vh - 430px);min-height:430px;margin-top:4px}
+ .scripture{font-size:27px}
+ .comment{font-size:16px}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="row">
-
+  <div class="topRow">
     <section class="card half pad">
       <div class="label">TIME</div>
       <div id="clock" class="bigtime">--:--</div>
@@ -86,40 +74,21 @@ body{min-height:100vh}
       <div id="forecast" class="forecast"></div>
       <div id="weatherUpdated" class="updated"></div>
     </section>
-
-    <section id="dailyCard" class="card half pad daily">
-      <div class="dailyContent">
-        <div class="label">EXAMINING THE SCRIPTURES DAILY</div>
-        <div id="dailyDate" class="dailyDate">Loading Daily Text...</div>
-        <div id="scripture" class="scripture">Loading...</div>
-        <div id="dailyRef" class="ref"></div>
-        <div id="comment" class="comment"></div>
-      </div>
-      <button id="choosePhoto" class="change" type="button">Change Picture</button>
-      <input id="photoInput" type="file" accept="image/*" style="display:none">
-    </section>
-
-    <section class="card half pad">
-      <div class="label">STOCKS</div>
-      <div id="stockRows" class="stockRows"></div>
-      <div id="stockUpdated" class="updated"></div>
-      <button id="editStocks" class="edit" type="button">Edit Stocks</button>
-    </section>
-
   </div>
-  <div class="footer">Daily Desk Dashboard — v1.9</div>
-</div>
 
-<div id="stockModal" class="modal">
-  <div class="modalBox">
-    <h2>Stocks</h2>
-    <p>Enter symbols separated by commas.</p>
-    <input id="symbols" type="text" value="AAPL,MSFT,NVDA,AMZN,TSLA,GOOG">
-    <div class="modalBtns">
-      <button id="cancelStocks" type="button">Cancel</button>
-      <button id="saveStocks" type="button">Save</button>
+  <section id="dailyCard" class="card daily pad">
+    <div class="dailyContent">
+      <div class="label">EXAMINING THE SCRIPTURES DAILY</div>
+      <div id="dailyDate" class="dailyDate">Loading Daily Text...</div>
+      <div id="scripture" class="scripture">Loading...</div>
+      <div id="dailyRef" class="ref"></div>
+      <div id="comment" class="comment"></div>
     </div>
-  </div>
+    <button id="choosePhoto" class="change" type="button">Change Picture</button>
+    <input id="photoInput" type="file" accept="image/*" style="display:none">
+  </section>
+
+  <div class="footer">Daily Desk Dashboard — v2.0</div>
 </div>
 
 <script>
@@ -450,202 +419,6 @@ document.getElementById("photoInput").onchange=function(){
   reader.readAsDataURL(file);
 };
 
-/* ---------- STOCKS ---------- */
-function refreshStocks(){
-  loadSavedSymbols();
-  renderStocks();
-  var rows=document.getElementById("stockRows").getElementsByClassName("stockRow");
-  var i;
-  for(i=0;i<rows.length;i++){
-    loadOneStock(rows[i].getAttribute("data-symbol"),rows[i]);
-  }
-  document.getElementById("stockUpdated").innerHTML="Updating prices...";
-}
-
-function loadSavedSymbols(){
-  var raw=getStorage("deskStocks");
-  if(raw){
-    try{symbols=JSON.parse(raw)}catch(e){symbols=null}
-  }
-  if(!symbols||!symbols.length)symbols=defaultSymbols.slice(0);
-}
-function renderStocks(){
-  var html="",i,s;
-  for(i=0;i<symbols.length;i++){
-    s=String(symbols[i]).toUpperCase().replace(/[^A-Z0-9.\-]/g,"");
-    if(!s)continue;
-    html+="<div class='stockRow' data-symbol='"+escapeHtml(s)+"'><b>"+escapeHtml(stockDisplaySymbol(s))+
-      "</b><span class='price'>--</span><span class='changeCol'>--</span><span class='pct'>--</span></div>";
-  }
-  document.getElementById("stockRows").innerHTML=html;
-}
-function stockApiSymbol(s){
-  s=String(s).toUpperCase();
-  if(s==="BTC")return "BTC-USD";
-  if(s==="ETH")return "ETH-USD";
-  if(s==="DOGE")return "DOGE-USD";
-  if(s==="XLM")return "XLM-USD";
-  return s;
-}
-function stockDisplaySymbol(s){
-  s=String(s).toUpperCase();
-  if(s==="BTC-USD")return "BTC";
-  if(s==="ETH-USD")return "ETH";
-  if(s==="DOGE-USD")return "DOGE";
-  if(s==="XLM-USD")return "XLM";
-  return s;
-}
-function stockIsCrypto(s){
-  s=String(s).toUpperCase();
-  return s==="BTC"||s==="BTC-USD"||s==="ETH"||s==="ETH-USD"||s==="DOGE"||s==="DOGE-USD"||s==="XLM"||s==="XLM-USD";
-}
-function setStockValues(row,price,change,pct){
-  var p=parseFloat(price),c=parseFloat(change),pc=parseFloat(pct),up=c>=0;
-  if(isNaN(p))throw "Bad price";
-  var ps=p<1?p.toFixed(4):p.toFixed(2);
-  row.getElementsByClassName("price")[0].innerHTML=ps;
-  if(isNaN(c)){
-    row.getElementsByClassName("changeCol")[0].innerHTML="--";
-    row.getElementsByClassName("pct")[0].innerHTML="--";
-    return;
-  }
-  row.getElementsByClassName("changeCol")[0].innerHTML=(up?"+":"-")+Math.abs(c).toFixed(2);
-  row.getElementsByClassName("pct")[0].innerHTML=(isNaN(pc)?"--":(up?"+":"-")+Math.abs(pc).toFixed(2)+"%");
-  row.getElementsByClassName("changeCol")[0].className="changeCol "+(up?"up":"down");
-  row.getElementsByClassName("pct")[0].className="pct "+(up?"up":"down");
-}
-function loadOneStock(s,row){
-  var api=stockApiSymbol(s);
-  row.getElementsByClassName("price")[0].innerHTML="...";
-  row.getElementsByClassName("changeCol")[0].innerHTML="--";
-  row.getElementsByClassName("pct")[0].innerHTML="--";
-
-  /* Crypto uses Coinbase's browser-friendly public price endpoint. */
-  if(stockIsCrypto(s)){
-    var cUrl="https://api.coinbase.com/v2/prices/"+encodeURIComponent(api)+"/spot";
-    xhr(cUrl,function(d){
-      try{
-        var amount=d&&d.data&&parseFloat(d.data.amount);
-        if(isNaN(amount))throw "No crypto price";
-        setStockValues(row,amount,NaN,NaN);
-      }catch(e){loadYahooStock(api,row)}
-    },function(){loadYahooStock(api,row)});
-    return;
-  }
-
-  /* Use Yahoo through browser-friendly CORS proxies. Direct Yahoo browser requests
-     are commonly blocked by CORS, so proxy first for reliability. */
-  loadYahooProxy("https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(api)+"?range=1d&interval=1d",row,0);
-}
-function findQuoteValues(d){
-  var out={price:null,change:null,pct:null,prev:null};
-  function walk(x){
-    if(!x||typeof x!=="object")return;
-    var k,v,lk;
-    for(k in x){
-      if(!x.hasOwnProperty(k))continue;
-      v=x[k]; lk=String(k).toLowerCase().replace(/[^a-z0-9]/g,"");
-      if(v&&typeof v==="object")walk(v);
-      else if(typeof v==="string"||typeof v==="number"){
-        if(out.price==null && (lk==="lastsaleprice"||lk==="lastsale"||lk==="lasttrade"||lk==="regularmarketprice"||lk==="price"))out.price=parseQuoteNumber(v);
-        if(out.change==null && (lk==="netchange"||lk==="change"||lk==="regularmarketchange"))out.change=parseQuoteNumber(v);
-        if(out.pct==null && (lk==="percentagechange"||lk==="percentchange"||lk==="regularmarketchangepercent"))out.pct=parseQuoteNumber(v);
-        if(out.prev==null && (lk==="previousclose"||lk==="previouscloseprice"||lk==="chartpreviousclose"))out.prev=parseQuoteNumber(v);
-      }
-    }
-  }
-  function parseQuoteNumber(v){
-    if(typeof v==="number")return v;
-    var s=String(v).replace(/[$,%+,]/g,"").trim();
-    if(s===""||s==="N/A")return null;
-    var n=parseFloat(s); return isNaN(n)?null:n;
-  }
-  walk(d);
-  if(out.change==null && out.price!=null && out.prev!=null)out.change=out.price-out.prev;
-  if(out.pct==null && out.change!=null && out.prev)out.pct=(out.change/out.prev)*100;
-  return out;
-}
-function loadYahooStock(api,row){
-  var url="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(api)+"?range=1d&interval=1d";
-  xhr(url,function(d){
-    try{useYahooData(d,row)}catch(e){loadYahooProxy(url,row,0)}
-  },function(){loadYahooProxy(url,row,0)});
-}
-function useYahooData(d,row){
-  var r=d.chart&&d.chart.result&&d.chart.result[0],q=r&&r.meta;
-  if(!q||q.regularMarketPrice==null)throw "No quote";
-  var price=q.regularMarketPrice,prev=q.chartPreviousClose;
-  if(prev==null && q.previousClose!=null)prev=q.previousClose;
-  var ch=(prev==null?NaN:price-prev),pct=(prev==null?NaN:(ch/prev)*100);
-  setStockValues(row,price,ch,pct);
-}
-function loadYahooProxy(url,row,n){
-  var proxies=[
-    "https://corsproxy.io/?url="+encodeURIComponent(url),
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(url)
-  ];
-  if(n>=proxies.length){
-    loadYahooHtmlProxy(url,row,0);
-    return;
-  }
-  xhr(proxies[n],function(d){
-    try{useYahooData(d,row); document.getElementById("stockUpdated").innerHTML="Prices updated";}catch(e){loadYahooProxy(url,row,n+1)}
-  },function(){loadYahooProxy(url,row,n+1)});
-}
-function loadYahooHtmlProxy(apiUrl,row,n){
-  var quoteUrl="https://finance.yahoo.com/quote/"+encodeURIComponent(apiUrl.split("/chart/")[1].split("?")[0])+"/";
-  var proxies=[
-    "https://corsproxy.io/?url="+encodeURIComponent(quoteUrl),
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(quoteUrl)
-  ];
-  if(n>=proxies.length){
-    row.getElementsByClassName("price")[0].innerHTML="--";
-    row.getElementsByClassName("changeCol")[0].innerHTML="--";
-    row.getElementsByClassName("pct")[0].innerHTML="--";
-    document.getElementById("stockUpdated").innerHTML="Some prices unavailable";
-    return;
-  }
-  xhrText(proxies[n],function(html){
-    try{
-      var price=html.match(/data-field=["']regularMarketPrice["'][^>]*>([^<]+)/i);
-      var change=html.match(/data-field=["']regularMarketChange["'][^>]*>([^<]+)/i);
-      var pct=html.match(/data-field=["']regularMarketChangePercent["'][^>]*>([^<]+)/i);
-      if(!price)throw "No HTML quote";
-      var p=parseFloat(String(price[1]).replace(/,/g,""));
-      var c=change?parseFloat(String(change[1]).replace(/[$,%+,]/g,"")):NaN;
-      var pc=pct?parseFloat(String(pct[1]).replace(/[$,%+,]/g,"")):NaN;
-      if(isNaN(p))throw "Bad HTML price";
-      setStockValues(row,p,c,pc);
-      document.getElementById("stockUpdated").innerHTML="Prices updated";
-    }catch(e){loadYahooHtmlProxy(apiUrl,row,n+1)}
-  },function(){loadYahooHtmlProxy(apiUrl,row,n+1)});
-}
-
-
-loadSavedSymbols();
-refreshStocks();
-window.setInterval(refreshStocks,300000);
-
-document.getElementById("editStocks").onclick=function(){
-  document.getElementById("symbols").value=symbols.join(",");
-  document.getElementById("stockModal").style.display="flex";
-};
-document.getElementById("cancelStocks").onclick=function(){
-  document.getElementById("stockModal").style.display="none";
-};
-document.getElementById("saveStocks").onclick=function(){
-  var a=document.getElementById("symbols").value.split(","),clean=[],i,s;
-  for(i=0;i<a.length;i++){
-    s=a[i].replace(/^\s+|\s+$/g,"").toUpperCase();
-    if(s&&clean.indexOf(s)<0)clean.push(s);
-  }
-  if(clean.length){
-    symbols=clean;
-    setStorage("deskStocks",JSON.stringify(symbols));
-    refreshStocks();
-  }
-  document.getElementById("stockModal").style.display="none";
-};
 
 })();
 </script>
