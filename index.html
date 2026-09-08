@@ -437,6 +437,17 @@ document.getElementById("photoInput").onchange=function(){
 };
 
 /* ---------- STOCKS ---------- */
+function refreshStocks(){
+  loadSavedSymbols();
+  renderStocks();
+  var rows=document.getElementById("stockRows").getElementsByClassName("stockRow");
+  var i;
+  for(i=0;i<rows.length;i++){
+    loadOneStock(rows[i].getAttribute("data-symbol"),rows[i]);
+  }
+  document.getElementById("stockUpdated").innerHTML="Updating prices...";
+}
+
 function loadSavedSymbols(){
   var raw=getStorage("deskStocks");
   if(raw){
@@ -506,15 +517,9 @@ function loadOneStock(s,row){
     return;
   }
 
-  /* Nasdaq is tried first for U.S. stocks because Yahoo does not allow browser CORS. */
-  var nUrl="https://api.nasdaq.com/api/quote/"+encodeURIComponent(api)+"/summary?assetclass=stocks";
-  xhr(nUrl,function(d){
-    try{
-      var vals=findQuoteValues(d);
-      if(vals.price==null)throw "No Nasdaq price";
-      setStockValues(row,vals.price,vals.change,vals.pct);
-    }catch(e){loadYahooStock(api,row)}
-  },function(){loadYahooStock(api,row)});
+  /* Use Yahoo through browser-friendly CORS proxies. Direct Yahoo browser requests
+     are commonly blocked by CORS, so proxy first for reliability. */
+  loadYahooProxy("https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(api)+"?range=1d&interval=1d",row,0);
 }
 function findQuoteValues(d){
   var out={price:null,change:null,pct:null,prev:null};
@@ -563,9 +568,15 @@ function loadYahooProxy(url,row,n){
     "https://corsproxy.io/?url="+encodeURIComponent(url),
     "https://api.allorigins.win/raw?url="+encodeURIComponent(url)
   ];
-  if(n>=proxies.length)return;
+  if(n>=proxies.length){
+    row.getElementsByClassName("price")[0].innerHTML="--";
+    row.getElementsByClassName("changeCol")[0].innerHTML="--";
+    row.getElementsByClassName("pct")[0].innerHTML="--";
+    document.getElementById("stockUpdated").innerHTML="Prices unavailable — tap Edit Stocks to change symbols";
+    return;
+  }
   xhr(proxies[n],function(d){
-    try{useYahooData(d,row)}catch(e){loadYahooProxy(url,row,n+1)}
+    try{useYahooData(d,row); document.getElementById("stockUpdated").innerHTML="Prices updated";}catch(e){loadYahooProxy(url,row,n+1)}
   },function(){loadYahooProxy(url,row,n+1)});
 }
 
