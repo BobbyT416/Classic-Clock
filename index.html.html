@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Daily Desk Dashboard</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+body{overflow:auto}.wrap{min-height:100%;padding:14px;display:flex;flex-direction:column;gap:14px}
+.grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;min-height:560px}
+.card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:linear-gradient(145deg,rgba(18,40,67,.95),rgba(7,19,34,.96));box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.pad{padding:24px}.label{font-size:13px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.62);font-weight:600}
+.time{font-size:clamp(46px,7vw,82px);font-weight:300;line-height:.95;margin-top:12px}.date{font-size:19px;color:#dbe7f4;margin-top:12px}
+.weatherTop{display:flex;justify-content:space-between;align-items:flex-start}.place{font-size:27px;font-weight:500;margin-top:7px}.temp{font-size:58px;font-weight:300;line-height:1}.condition{font-size:18px;color:#d8e3ef;margin-top:4px}
+.wdetail{margin-top:20px;font-size:14px;color:#b8c8d8}.forecast{display:flex;gap:8px;margin-top:18px}.day{flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.06);border-radius:10px;font-size:12px;color:#cbd8e5}.day b{display:block;color:#fff;margin:4px 0}
+.stocks{width:100%;border-collapse:collapse;margin-top:14px}.stocks th{text-align:left;color:#8498ab;font-size:11px;text-transform:uppercase;padding:7px;border-bottom:1px solid rgba(255,255,255,.12)}.stocks td{padding:9px 7px;border-bottom:1px solid rgba(255,255,255,.07);font-size:14px}.up{color:#9ee6b0}.down{color:#ffaaa8}.edit{position:absolute;right:18px;bottom:16px;background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 10px;font-size:11px}
+.daily{background:#101d2a}.daily:before{content:"";position:absolute;inset:0;background-image:var(--daily-bg);background-size:cover;background-position:center;opacity:.58}.daily:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.78))}
+.daily>*{position:relative;z-index:2}.daily .content{height:100%;padding:23px 25px 50px;display:flex;flex-direction:column}.verse{font-size:clamp(25px,3.1vw,39px);line-height:1.15;font-weight:500;max-width:92%;text-shadow:0 2px 7px #000;margin-top:10px}.ref{font-size:16px;color:#e1eaf2;margin-top:9px}.comment{margin-top:18px;flex:1;overflow:auto;padding-right:7px;font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);text-shadow:0 1px 4px #000}.change{position:absolute;right:16px;bottom:14px;z-index:4;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:7px 10px;font-size:11px}.footer{font-size:11px;color:#667788;text-align:center;padding:0 0 2px}
+#picker{display:none}
+@media(max-width:700px){.wrap{padding:9px;gap:9px}.grid{display:flex;flex-direction:column;min-height:0}.card{min-height:330px}.pad{padding:19px}.daily{min-height:430px}.time{font-size:55px}.place{font-size:24px}.temp{font-size:48px}.verse{font-size:29px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="grid">
+<section class="card pad">
+<div class="label">Time</div><div id="time" class="time">--:--</div><div id="date" class="date">Loading date…</div>
+</section>
+
+<section class="card pad">
+<div class="weatherTop"><div><div class="label">Weather</div><div id="place" class="place">Current Location</div><div id="condition" class="condition">Loading weather…</div></div><div id="temp" class="temp">--°</div></div>
+<div id="wdetail" class="wdetail"></div><div id="forecast" class="forecast"></div>
+</section>
+
+<section id="dailyCard" class="card daily">
+<div class="content"><div class="label">Examining the Scriptures Daily</div><div id="verse" class="verse">Loading today’s Daily Text…</div><div id="ref" class="ref"></div><div id="comment" class="comment">Connecting to Watchtower ONLINE LIBRARY…</div></div>
+<button class="change" onclick="document.getElementById('picker').click()">Change Picture</button>
+<input id="picker" type="file" accept="image/*">
+</section>
+
+<section class="card pad">
+<div class="label">My Stocks</div><table class="stocks"><thead><tr><th>Symbol</th><th>Price</th><th>Change</th></tr></thead><tbody id="stocks"></tbody></table>
+<button class="edit" onclick="editStocks()">Edit Stocks</button></section>
+</div>
+<div class="footer">Daily Desk Dashboard — v1.4</div>
+</div>
+
+<script>
+var VERSION="1.4";
+var stockKey="dddStocks",bgKey="dddDailyBg";
+function tick(){var d=new Date();document.getElementById("time").textContent=d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});document.getElementById("date").textContent=d.toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});}
+tick();setInterval(tick,1000);
+
+function setBg(data){document.getElementById("dailyCard").style.setProperty("--daily-bg","url('"+data+"')");}
+var saved=localStorage.getItem(bgKey); if(saved)setBg(saved);
+document.getElementById("picker").onchange=function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{localStorage.setItem(bgKey,r.result)}catch(x){}setBg(r.result)};r.readAsDataURL(f)};
+
+function editStocks(){var cur=localStorage.getItem(stockKey)||"AAPL,MSFT,NVDA,AMZN,TSLA,GOOG";var v=prompt("Enter stock symbols separated by commas:",cur);if(v!==null){localStorage.setItem(stockKey,v.toUpperCase().replace(/[^A-Z0-9,]/g,""));loadStocks()}}
+function loadStocks(){var s=(localStorage.getItem(stockKey)||"AAPL,MSFT,NVDA,AMZN,TSLA,GOOG").split(",").filter(Boolean);document.getElementById("stocks").innerHTML=s.map(function(x){return "<tr><td><b>"+x+"</b></td><td id='p_"+x+"'>--</td><td id='c_"+x+"'>--</td></tr>"}).join("");s.forEach(fetchStock)}
+function fetchStock(sym){var u="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(sym)+"?range=1d&interval=1d";fetch(u).then(function(r){return r.json()}).then(function(j){var m=j.chart.result[0].meta,last=m.regularMarketPrice,prev=m.previousClose,ch=last-prev,pct=ch/prev*100;document.getElementById("p_"+sym).textContent=last.toFixed(2);var c=document.getElementById("c_"+sym);c.textContent=(ch>=0?"+":"")+ch.toFixed(2)+" ("+(ch>=0?"+":"")+pct.toFixed(2)+"%)";c.className=ch>=0?"up":"down"}).catch(function(){})}
+loadStocks();
+
+function weatherCode(c){var a={0:"Clear",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",71:"Light snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy showers",95:"Thunderstorms",96:"Thunderstorms",99:"Thunderstorms"};return a[c]||"Current conditions"}
+function loadWeather(lat,lon){
+var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&forecast_days=5&timezone=auto";
+fetch(url).then(function(r){return r.json()}).then(function(j){document.getElementById("temp").textContent=Math.round(j.current.temperature_2m)+"°";document.getElementById("condition").textContent=weatherCode(j.current.weather_code);document.getElementById("wdetail").textContent="Feels like "+Math.round(j.current.apparent_temperature)+"°";var days=j.daily.time;document.getElementById("forecast").innerHTML=days.map(function(d,i){var x=new Date(d+"T12:00:00");return "<div class='day'>"+x.toLocaleDateString([], {weekday:"short"})+"<b>"+Math.round(j.daily.temperature_2m_max[i])+"° / "+Math.round(j.daily.temperature_2m_min[i])+"°</b>"+weatherCode(j.daily.weather_code[i])+"</div>"}).join("")});
+}
+function geo(){if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(function(p){var lat=p.coords.latitude,lon=p.coords.longitude;loadWeather(lat,lon);fetch("https://geocoding-api.open-meteo.com/v1/reverse?latitude="+lat+"&longitude="+lon+"&count=1&language=en&format=json").then(function(r){return r.json()}).then(function(j){if(j.results&&j.results[0]){var x=j.results[0];document.getElementById("place").textContent=(x.name||"Current Location")+(x.admin1?", "+x.admin1:"")}}).catch(function(){})},function(){document.getElementById("condition").textContent="Location permission needed"});}
+geo();
+
+var fallback={};
+fallback["2026-09-08"]={verse:"Jehovah kept warning Israel and Judah through all his prophets.",ref:"— 2 Ki. 17:13.",comment:"Jehovah often used his prophets to warn and correct his people. For example, God said through Jeremiah: “Return, O renegade Israel . . . I will not look down angrily on you, for I am loyal . . . I will not stay resentful forever. Only acknowledge your guilt, for you have rebelled against Jehovah.” By means of Joel, Jehovah said: “Return to me with all your hearts.” He had Isaiah declare: “Make yourselves clean; remove your evil deeds from my sight; stop doing bad.” And by means of Ezekiel, Jehovah asked: “Do I take any pleasure at all in the death of a wicked person? . . . Do I not prefer that he turn away from his ways and keep living? I do not take any pleasure in the death of anyone, . . . so turn back and live.” Jehovah takes delight in seeing people repent because he wants them to keep living—forever!"};
+function renderDaily(d){document.getElementById("verse").textContent=d.verse;document.getElementById("ref").textContent=d.ref;document.getElementById("comment").textContent=d.comment}
+function loadDaily(){
+var now=new Date(), y=now.getFullYear(),m=now.getMonth()+1,day=now.getDate(),key=y+"-"+String(m).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+if(fallback[key])renderDaily(fallback[key]);
+var cache=localStorage.getItem("dddDaily");if(cache){try{var c=JSON.parse(cache);if(c.key===key)renderDaily(c.data)}catch(e){}}
+var url="https://wol.jw.org/en/wol/dt/r1/lp-e/"+y+"/"+m+"/"+day;
+fetch(url).then(function(r){return r.text()}).then(function(t){
+var title=t.match(/<h2[^>]*>\\s*[^<]*\\s*<\\/h2>/i); // WOL HTML varies; use visible text heuristics below
+var plain=t.replace(/<script[\\s\\S]*?<\\/script>/gi," ").replace(/<style[\\s\\S]*?<\\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\\s+/g," ").trim();
+var mt=plain.match(/Examining the Scriptures Daily—\\d{4}\\s+[^.]+\\.\\s*—\\s*[^.]+\\./);
+if(!mt)throw 0;
+var text=mt[0].replace(/^Examining the Scriptures Daily—\\d{4}\\s+/,"");
+var dash=text.lastIndexOf("—");var verse=text.slice(0,dash).trim();var ref=text.slice(dash+1).trim();
+var start=plain.indexOf(text)+text.length;var tail=plain.slice(start).replace(/^\\s+/,"");var end=tail.search(/\\bw\\d{2}\\.\\d{2}/);if(end>0)tail=tail.slice(0,end);var data={verse:verse.replace(/\\.$/,""),ref:ref,comment:tail.trim()};
+if(data.verse.length>10){renderDaily(data);localStorage.setItem("dddDaily",JSON.stringify({key:key,data:data}))}
+}).catch(function(){});
+}
+loadDaily();setInterval(loadDaily,3600000);
+</script>
+</body></html>
