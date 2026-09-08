@@ -107,7 +107,7 @@ body{min-height:100vh}
     </section>
 
   </div>
-  <div class="footer">Daily Desk Dashboard — v1.5</div>
+  <div class="footer">Daily Desk Dashboard — v1.6</div>
 </div>
 
 <div id="stockModal" class="modal">
@@ -285,39 +285,54 @@ function parseDailyText(raw,d){
     .replace(/\s+/g," ").replace(/^\s+|\s+$/g,"");
 
   var marker="Examining the Scriptures Daily—"+d.getFullYear();
-  var pos=text.indexOf(marker);
-  if(pos<0)pos=text.indexOf("Examining the Scriptures Daily");
-  if(pos<0)throw "Daily marker not found";
+  var markerPos=text.indexOf(marker);
+  if(markerPos<0) markerPos=text.indexOf("Examining the Scriptures Daily");
+  if(markerPos<0) throw "Daily marker not found";
 
-  var tail=text.substring(pos);
-  var dateNeedle=monthsName(d.getMonth())+" "+d.getDate();
-  var p=tail.indexOf(dateNeedle);
-  if(p<0)throw "Date not found";
+  var dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var heading=dayNames[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate();
+  var headingPos=text.indexOf(heading,markerPos);
+  if(headingPos<0) throw "Daily date heading not found";
 
-  var chunk=tail.substring(p,p+5000);
-  var yearStart=chunk.indexOf(String(d.getFullYear()));
-  if(yearStart>=0)chunk=chunk.substring(yearStart+4);
-  chunk=chunk.replace(/^\s+[-—]\s+/," ");
+  /* Only inspect the first part of the day's entry. This prevents the
+     parser from wandering into the congregation meeting schedule below it. */
+  var chunk=text.substring(headingPos,headingPos+3000);
 
-  var quote=chunk.match(/[“"]([^”"]+)[”"]/);
-  if(!quote)throw "Verse not found";
+  /* The Daily Text verse is immediately followed by its Bible citation.
+     Require that citation so a meeting question such as “two families”
+     cannot be mistaken for the verse. */
+  var citation=/[—-]\s*((?:[1-3]\s*)?[A-Za-z]{2,12}\.?\s+\d+(?::\d+)(?:[-–]\d+)?)/.exec(chunk);
+  if(!citation) throw "Daily citation not found";
 
-  var q=quote[1];
-  var before=chunk.substring(0,quote.index+quote[0].length);
-  var refMatch=before.match(/(?:—|-\s*)([1-3]?\s?[A-Za-z]+\s+\d+:\d+(?:-\d+)?)/);
-  var ref=refMatch?refMatch[1]:"";
+  var citationStart=citation.index;
+  var verseArea=chunk.substring(0,citationStart);
+  var quoteMatches=[],m,re=/[“"]([^”"]{8,240})[”"]/g;
+  while((m=re.exec(verseArea))!==null) quoteMatches.push(m[1]);
+  if(!quoteMatches.length) throw "Daily verse not found";
 
-  var cStart=chunk.indexOf("Jehovah",quote.index+quote[0].length);
-  if(cStart<0)cStart=quote.index+quote[0].length;
-  var comment=chunk.substring(cStart).replace(/\s+/g," ");
-  var end=comment.indexOf(" w2");
-  if(end>200)comment=comment.substring(0,end);
+  /* Use the last quote immediately before the citation. */
+  var q=quoteMatches[quoteMatches.length-1];
+  if(q.length<8) throw "Daily verse too short";
+
+  var after=chunk.substring(citationStart+citation[0].length);
+  var nextHeading=after.search(/\b[A-Z][A-Z ]{5,}\b/);
+  if(nextHeading>2000) after=after.substring(0,nextHeading);
+  var comment=after.replace(/^[\s.,;:—-]+/,"").replace(/\s+/g," ").trim();
+
+  /* Remove obvious meeting-schedule contamination if it ever appears. */
+  var bad=["FAMILY WORSHIP IDEA","TREASURES FROM GOD'S WORD","APPLY YOURSELF TO THE FIELD MINISTRY","LIVING AS CHRISTIANS"];
+  var bi,i;
+  for(i=0;i<bad.length;i++){
+    bi=comment.indexOf(bad[i]);
+    if(bi>100) comment=comment.substring(0,bi).trim();
+  }
 
   return {
     date:isoDate(d),
     label:prettyDailyDate(d),
     scripture:q,
-    ref:ref?"— "+ref:"",
+    ref:"— "+citation[1].replace(/\s+/g," "),
     comment:comment
   };
 }
@@ -326,16 +341,26 @@ function monthsName(i){
 }
 function loadDaily(){
   var d=new Date(),today=isoDate(d),cached=getDailyCache();
+
+  /* Never let a bad scrape replace a known-good Daily Text. */
+  if(today===dailyFallback.date){
+    applyDaily(dailyFallback);
+  }else if(cached && cached.date===today){
+    applyDaily(cached);
+  }
+
   var url="https://wol.jw.org/en/wol/dt/r1/lp-e/"+d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();
 
   function finish(){
-    if(cached && cached.date===today){applyDaily(cached);return}
     if(today===dailyFallback.date){applyDaily(dailyFallback);return}
-    if(cached){applyDaily(cached);return}
-    document.getElementById("dailyDate").innerHTML=prettyDailyDate(d);
-    document.getElementById("scripture").innerHTML="Daily Text unavailable";
-    document.getElementById("dailyRef").innerHTML="";
-    document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
+    if(cached && cached.date===today){applyDaily(cached);return}
+    if(!document.getElementById("scripture").innerHTML ||
+       document.getElementById("scripture").innerHTML==="Loading..."){
+      document.getElementById("dailyDate").innerHTML=prettyDailyDate(d);
+      document.getElementById("scripture").innerHTML="Daily Text unavailable";
+      document.getElementById("dailyRef").innerHTML="";
+      document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
+    }
   }
   function attempt(u,next){
     var x;
@@ -346,17 +371,17 @@ function loadDaily(){
           if(x.status>=200 && x.status<300){
             try{
               var e=parseDailyText(x.responseText,d);
-              saveDaily(e);applyDaily(e);return;
+              if(e && e.scripture && e.ref && e.comment){
+                saveDaily(e);applyDaily(e);return;
+              }
             }catch(ignore){}
           }
-          if(next)next();
-          else finish();
+          if(next)next(); else finish();
         }
       };
       x.open("GET",u,true);x.send(null);
     }catch(err){if(next)next();else finish()}
   }
-
   attempt(url,function(){
     attempt("https://r.jina.ai/"+url,function(){
       attempt("https://api.allorigins.win/raw?url="+encodeURIComponent(url),null);
@@ -424,25 +449,64 @@ function renderStocks(){
   for(i=0;i<symbols.length;i++){
     s=String(symbols[i]).toUpperCase().replace(/[^A-Z0-9.\-]/g,"");
     if(!s)continue;
-    html+="<div class='stockRow' data-symbol='"+escapeHtml(s)+"'><b>"+escapeHtml(s)+
+    html+="<div class='stockRow' data-symbol='"+escapeHtml(s)+"'><b>"+escapeHtml(stockDisplaySymbol(s))+
       "</b><span class='price'>--</span><span class='changeCol'>--</span><span class='pct'>--</span></div>";
   }
   document.getElementById("stockRows").innerHTML=html;
 }
+function stockApiSymbol(s){
+  s=String(s).toUpperCase();
+  if(s==="BTC")return "BTC-USD";
+  if(s==="ETH")return "ETH-USD";
+  if(s==="DOGE")return "DOGE-USD";
+  return s;
+}
+function stockDisplaySymbol(s){
+  s=String(s).toUpperCase();
+  if(s==="BTC-USD")return "BTC";
+  if(s==="ETH-USD")return "ETH";
+  if(s==="DOGE-USD")return "DOGE";
+  return s;
+}
 function loadOneStock(s,row){
-  var url="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(s)+"?range=1d&interval=1m";
-  xhr(url,function(d){
+  var api=stockApiSymbol(s);
+  var url="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(api)+"?range=1d&interval=1m";
+  function useData(d){
     var r=d.chart&&d.chart.result&&d.chart.result[0],q=r&&r.meta;
-    if(!q||q.regularMarketPrice==null)return;
+    if(!q||q.regularMarketPrice==null)throw "No quote";
     var price=q.regularMarketPrice,prev=q.chartPreviousClose;
-    if(prev==null)return;
+    if(prev==null && q.previousClose!=null)prev=q.previousClose;
+    if(prev==null)throw "No previous close";
     var ch=price-prev,pct=(ch/prev)*100,up=ch>=0;
     row.getElementsByClassName("price")[0].innerHTML=price.toFixed(2);
     row.getElementsByClassName("changeCol")[0].innerHTML=(up?"+":"-")+Math.abs(ch).toFixed(2);
     row.getElementsByClassName("pct")[0].innerHTML=(up?"+":"-")+Math.abs(pct).toFixed(2)+"%";
     row.getElementsByClassName("changeCol")[0].className="changeCol "+(up?"up":"down");
     row.getElementsByClassName("pct")[0].className="pct "+(up?"up":"down");
+    return true;
+  }
+  xhr(url,function(d){
+    try{useData(d)}catch(e){loadStockProxy(url,row)}
+  },function(){loadStockProxy(url,row)});
+}
+function loadStockProxy(url,row){
+  var proxy="https://api.allorigins.win/raw?url="+encodeURIComponent(url);
+  xhr(proxy,function(d){
+    try{useDataProxy(d,row)}catch(e){}
   },function(){});
+}
+function useDataProxy(d,row){
+  var r=d.chart&&d.chart.result&&d.chart.result[0],q=r&&r.meta;
+  if(!q||q.regularMarketPrice==null)throw "No quote";
+  var price=q.regularMarketPrice,prev=q.chartPreviousClose;
+  if(prev==null && q.previousClose!=null)prev=q.previousClose;
+  if(prev==null)throw "No previous close";
+  var ch=price-prev,pct=(ch/prev)*100,up=ch>=0;
+  row.getElementsByClassName("price")[0].innerHTML=price.toFixed(2);
+  row.getElementsByClassName("changeCol")[0].innerHTML=(up?"+":"-")+Math.abs(ch).toFixed(2);
+  row.getElementsByClassName("pct")[0].innerHTML=(up?"+":"-")+Math.abs(pct).toFixed(2)+"%";
+  row.getElementsByClassName("changeCol")[0].className="changeCol "+(up?"up":"down");
+  row.getElementsByClassName("pct")[0].className="pct "+(up?"up":"down");
 }
 function refreshStocks(){
   renderStocks();
