@@ -107,7 +107,7 @@ body{min-height:100vh}
     </section>
 
   </div>
-  <div class="footer">Daily Desk Dashboard — v1.7</div>
+  <div class="footer">Daily Desk Dashboard — v1.9</div>
 </div>
 
 <div id="stockModal" class="modal">
@@ -162,6 +162,20 @@ function xhr(url,ok,fail){
         if(x.status>=200 && x.status<300){
           try{ok(JSON.parse(x.responseText))}catch(e){if(fail)fail()}
         }else if(fail){fail()}
+      }
+    };
+    x.open("GET",url,true);
+    x.send(null);
+  }catch(e){if(fail)fail()}
+}
+function xhrText(url,ok,fail){
+  var x;
+  try{
+    x=new XMLHttpRequest();
+    x.onreadystatechange=function(){
+      if(x.readyState===4){
+        if(x.status>=200 && x.status<300){ok(x.responseText)}
+        else if(fail){fail()}
       }
     };
     x.open("GET",url,true);
@@ -470,6 +484,7 @@ function stockApiSymbol(s){
   if(s==="BTC")return "BTC-USD";
   if(s==="ETH")return "ETH-USD";
   if(s==="DOGE")return "DOGE-USD";
+  if(s==="XLM")return "XLM-USD";
   return s;
 }
 function stockDisplaySymbol(s){
@@ -477,11 +492,12 @@ function stockDisplaySymbol(s){
   if(s==="BTC-USD")return "BTC";
   if(s==="ETH-USD")return "ETH";
   if(s==="DOGE-USD")return "DOGE";
+  if(s==="XLM-USD")return "XLM";
   return s;
 }
 function stockIsCrypto(s){
   s=String(s).toUpperCase();
-  return s==="BTC"||s==="BTC-USD"||s==="ETH"||s==="ETH-USD"||s==="DOGE"||s==="DOGE-USD";
+  return s==="BTC"||s==="BTC-USD"||s==="ETH"||s==="ETH-USD"||s==="DOGE"||s==="DOGE-USD"||s==="XLM"||s==="XLM-USD";
 }
 function setStockValues(row,price,change,pct){
   var p=parseFloat(price),c=parseFloat(change),pc=parseFloat(pct),up=c>=0;
@@ -569,16 +585,42 @@ function loadYahooProxy(url,row,n){
     "https://api.allorigins.win/raw?url="+encodeURIComponent(url)
   ];
   if(n>=proxies.length){
-    row.getElementsByClassName("price")[0].innerHTML="--";
-    row.getElementsByClassName("changeCol")[0].innerHTML="--";
-    row.getElementsByClassName("pct")[0].innerHTML="--";
-    document.getElementById("stockUpdated").innerHTML="Prices unavailable — tap Edit Stocks to change symbols";
+    loadYahooHtmlProxy(url,row,0);
     return;
   }
   xhr(proxies[n],function(d){
     try{useYahooData(d,row); document.getElementById("stockUpdated").innerHTML="Prices updated";}catch(e){loadYahooProxy(url,row,n+1)}
   },function(){loadYahooProxy(url,row,n+1)});
 }
+function loadYahooHtmlProxy(apiUrl,row,n){
+  var quoteUrl="https://finance.yahoo.com/quote/"+encodeURIComponent(apiUrl.split("/chart/")[1].split("?")[0])+"/";
+  var proxies=[
+    "https://corsproxy.io/?url="+encodeURIComponent(quoteUrl),
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(quoteUrl)
+  ];
+  if(n>=proxies.length){
+    row.getElementsByClassName("price")[0].innerHTML="--";
+    row.getElementsByClassName("changeCol")[0].innerHTML="--";
+    row.getElementsByClassName("pct")[0].innerHTML="--";
+    document.getElementById("stockUpdated").innerHTML="Some prices unavailable";
+    return;
+  }
+  xhrText(proxies[n],function(html){
+    try{
+      var price=html.match(/data-field=["']regularMarketPrice["'][^>]*>([^<]+)/i);
+      var change=html.match(/data-field=["']regularMarketChange["'][^>]*>([^<]+)/i);
+      var pct=html.match(/data-field=["']regularMarketChangePercent["'][^>]*>([^<]+)/i);
+      if(!price)throw "No HTML quote";
+      var p=parseFloat(String(price[1]).replace(/,/g,""));
+      var c=change?parseFloat(String(change[1]).replace(/[$,%+,]/g,"")):NaN;
+      var pc=pct?parseFloat(String(pct[1]).replace(/[$,%+,]/g,"")):NaN;
+      if(isNaN(p))throw "Bad HTML price";
+      setStockValues(row,p,c,pc);
+      document.getElementById("stockUpdated").innerHTML="Prices updated";
+    }catch(e){loadYahooHtmlProxy(apiUrl,row,n+1)}
+  },function(){loadYahooHtmlProxy(apiUrl,row,n+1)});
+}
+
 
 loadSavedSymbols();
 refreshStocks();
