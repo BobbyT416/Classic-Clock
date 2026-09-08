@@ -2,92 +2,480 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Daily Desk Dashboard</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
-body{overflow:auto}.wrap{min-height:100%;padding:14px;display:flex;flex-direction:column;gap:14px}
-.grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;min-height:560px}
-.card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:18px;background:linear-gradient(145deg,rgba(18,40,67,.95),rgba(7,19,34,.96));box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.pad{padding:24px}.label{font-size:13px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.62);font-weight:600}
-.time{font-size:clamp(46px,7vw,82px);font-weight:300;line-height:.95;margin-top:12px}.date{font-size:19px;color:#dbe7f4;margin-top:12px}
-.weatherTop{display:flex;justify-content:space-between;align-items:flex-start}.place{font-size:27px;font-weight:500;margin-top:7px}.temp{font-size:58px;font-weight:300;line-height:1}.condition{font-size:18px;color:#d8e3ef;margin-top:4px}
-.wdetail{margin-top:20px;font-size:14px;color:#b8c8d8}.forecast{display:flex;gap:8px;margin-top:18px}.day{flex:1;text-align:center;padding:9px 4px;background:rgba(255,255,255,.06);border-radius:10px;font-size:12px;color:#cbd8e5}.day b{display:block;color:#fff;margin:4px 0}
-.stocks{width:100%;border-collapse:collapse;margin-top:14px}.stocks th{text-align:left;color:#8498ab;font-size:11px;text-transform:uppercase;padding:7px;border-bottom:1px solid rgba(255,255,255,.12)}.stocks td{padding:9px 7px;border-bottom:1px solid rgba(255,255,255,.07);font-size:14px}.up{color:#9ee6b0}.down{color:#ffaaa8}.edit{position:absolute;right:18px;bottom:16px;background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 10px;font-size:11px}
-.daily{background:#101d2a}.daily:before{content:"";position:absolute;inset:0;background-image:var(--daily-bg);background-size:cover;background-position:center;opacity:.58}.daily:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.78))}
-.daily>*{position:relative;z-index:2}.daily .content{height:100%;padding:23px 25px 50px;display:flex;flex-direction:column}.verse{font-size:clamp(25px,3.1vw,39px);line-height:1.15;font-weight:500;max-width:92%;text-shadow:0 2px 7px #000;margin-top:10px}.ref{font-size:16px;color:#e1eaf2;margin-top:9px}.comment{margin-top:18px;flex:1;overflow:auto;padding-right:7px;font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);text-shadow:0 1px 4px #000}.change{position:absolute;right:16px;bottom:14px;z-index:4;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.45);color:#fff;border-radius:8px;padding:7px 10px;font-size:11px}.footer{font-size:11px;color:#667788;text-align:center;padding:0 0 2px}
-#picker{display:none}
-@media(max-width:700px){.wrap{padding:9px;gap:9px}.grid{display:flex;flex-direction:column;min-height:0}.card{min-height:330px}.pad{padding:19px}.daily{min-height:430px}.time{font-size:55px}.place{font-size:24px}.temp{font-size:48px}.verse{font-size:29px}}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#000;color:#f2f6fb;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+body{min-height:100vh}
+.wrap{width:100%;max-width:1200px;margin:0 auto;padding:18px}
+.row{display:flex;flex-wrap:wrap;margin:-8px}
+.card{position:relative;margin:8px;background:#081a2d;border:1px solid rgba(160,195,225,.35);border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden;min-height:270px}
+.half{width:calc(50% - 16px)}
+.pad{padding:28px}
+.label{font-size:16px;letter-spacing:3px;color:#aebed0;margin-bottom:24px}
+.bigtime{font-size:72px;line-height:1;font-weight:300;letter-spacing:1px}
+.ampm{font-size:22px;font-weight:600;vertical-align:middle;margin-left:8px;letter-spacing:1px}
+.date{font-size:25px;color:#dce6f0;margin-top:24px}
+.place{font-size:30px;margin-top:6px}
+.temp{font-size:58px;font-weight:300;position:absolute;right:28px;top:58px}
+.weatherline{font-size:24px;color:#dbe5ef;margin-top:8px}
+.weathericon{font-size:38px;margin-top:18px}
+.details{font-size:17px;line-height:1.65;color:#c8d4df;margin-top:14px}
+.forecast{display:flex;flex-wrap:wrap;margin-top:18px}
+.fc{font-size:13px;text-align:center;color:#cbd7e2;min-width:72px;margin-right:10px;margin-bottom:8px}
+.fc i{display:block;font-style:normal;font-size:24px;margin:4px 0}
+.updated{font-size:12px;color:#8193a5;margin-top:10px}
+.daily{background-position:center;background-size:cover;background-repeat:no-repeat}
+.daily:before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,12,21,.45),rgba(3,12,21,.78));pointer-events:none}
+.dailyContent{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+.dailyDate{font-size:18px;color:#d1dce7;margin-bottom:18px}
+.scripture{font-size:28px;line-height:1.28;font-weight:500}
+.ref{font-size:20px;color:#d4e0eb;margin-top:10px}
+.comment{font-size:16px;line-height:1.55;color:#d0dae4;margin-top:18px;overflow:auto;-webkit-overflow-scrolling:touch;max-height:210px;padding-right:5px}
+.change{position:absolute;right:18px;bottom:16px;z-index:3;background:rgba(5,18,32,.82);border:1px solid rgba(190,215,235,.4);border-radius:10px;color:#eef5fb;padding:9px 12px;font-size:13px}
+.stockRows{margin-top:4px}
+.stockRow{display:flex;align-items:center;border-bottom:1px solid rgba(180,205,225,.13);padding:11px 0;font-size:16px}
+.stockRow b{width:70px}
+.stockRow span{display:block;text-align:right}
+.price{width:80px}
+.changeCol{width:85px}
+.pct{width:72px}
+.up{color:#77d69a}.down{color:#ff8e8e}
+.edit{margin-top:14px;background:rgba(70,120,165,.25);border:1px solid rgba(190,215,235,.35);border-radius:9px;color:#eef5fb;padding:8px 12px}
+.footer{text-align:center;color:#5f7387;font-size:12px;padding:8px 0 18px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:20;align-items:center;justify-content:center}
+.modalBox{background:#0b1c2e;border:1px solid rgba(180,210,235,.4);border-radius:16px;padding:22px;width:90%;max-width:460px}
+.modalBox h2{margin-top:0}
+.modalBox input{width:100%;padding:12px;border-radius:8px;border:1px solid #587087;background:#061322;color:#fff;font-size:17px}
+.modalBtns{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+.modalBtns button{padding:9px 14px;border-radius:8px;border:1px solid #587087;background:#10263b;color:#fff}
+@media(max-width:760px){
+ .wrap{padding:8px}
+ .half{width:calc(100% - 16px)}
+ .card{min-height:260px;border-radius:20px}
+ .pad{padding:24px}
+ .bigtime{font-size:58px}
+ .date{font-size:22px}
+ .place{font-size:27px}
+ .temp{font-size:48px;right:24px}
+ .scripture{font-size:25px}
+ .comment{max-height:220px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="grid">
-<section class="card pad">
-<div class="label">Time</div><div id="time" class="time">--:--</div><div id="date" class="date">Loading date…</div>
-</section>
+  <div class="row">
 
-<section class="card pad">
-<div class="weatherTop"><div><div class="label">Weather</div><div id="place" class="place">Current Location</div><div id="condition" class="condition">Loading weather…</div></div><div id="temp" class="temp">--°</div></div>
-<div id="wdetail" class="wdetail"></div><div id="forecast" class="forecast"></div>
-</section>
+    <section class="card half pad">
+      <div class="label">TIME</div>
+      <div id="clock" class="bigtime">--:--</div>
+      <div id="date" class="date">Loading date...</div>
+    </section>
 
-<section id="dailyCard" class="card daily">
-<div class="content"><div class="label">Examining the Scriptures Daily</div><div id="verse" class="verse">Loading today’s Daily Text…</div><div id="ref" class="ref"></div><div id="comment" class="comment">Connecting to Watchtower ONLINE LIBRARY…</div></div>
-<button class="change" onclick="document.getElementById('picker').click()">Change Picture</button>
-<input id="picker" type="file" accept="image/*">
-</section>
+    <section class="card half pad">
+      <div class="label">WEATHER</div>
+      <div id="weatherPlace" class="place">Current Location</div>
+      <div id="temp" class="temp">--°</div>
+      <div id="weatherIcon" class="weathericon"></div>
+      <div id="condition" class="weatherline">Loading weather...</div>
+      <div id="highlow" class="details"></div>
+      <div id="forecast" class="forecast"></div>
+      <div id="weatherUpdated" class="updated"></div>
+    </section>
 
-<section class="card pad">
-<div class="label">My Stocks</div><table class="stocks"><thead><tr><th>Symbol</th><th>Price</th><th>Change</th></tr></thead><tbody id="stocks"></tbody></table>
-<button class="edit" onclick="editStocks()">Edit Stocks</button></section>
+    <section id="dailyCard" class="card half pad daily">
+      <div class="dailyContent">
+        <div class="label">EXAMINING THE SCRIPTURES DAILY</div>
+        <div id="dailyDate" class="dailyDate">Loading Daily Text...</div>
+        <div id="scripture" class="scripture">Loading...</div>
+        <div id="dailyRef" class="ref"></div>
+        <div id="comment" class="comment"></div>
+      </div>
+      <button id="choosePhoto" class="change" type="button">Change Picture</button>
+      <input id="photoInput" type="file" accept="image/*" style="display:none">
+    </section>
+
+    <section class="card half pad">
+      <div class="label">STOCKS</div>
+      <div id="stockRows" class="stockRows"></div>
+      <div id="stockUpdated" class="updated"></div>
+      <button id="editStocks" class="edit" type="button">Edit Stocks</button>
+    </section>
+
+  </div>
+  <div class="footer">Daily Desk Dashboard — v1.5</div>
 </div>
-<div class="footer">Daily Desk Dashboard — v1.4</div>
+
+<div id="stockModal" class="modal">
+  <div class="modalBox">
+    <h2>Stocks</h2>
+    <p>Enter symbols separated by commas.</p>
+    <input id="symbols" type="text" value="AAPL,MSFT,NVDA,AMZN,TSLA,GOOG">
+    <div class="modalBtns">
+      <button id="cancelStocks" type="button">Cancel</button>
+      <button id="saveStocks" type="button">Save</button>
+    </div>
+  </div>
 </div>
 
 <script>
-var VERSION="1.4";
-var stockKey="dddStocks",bgKey="dddDailyBg";
-function tick(){var d=new Date();document.getElementById("time").textContent=d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});document.getElementById("date").textContent=d.toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});}
-tick();setInterval(tick,1000);
+(function(){
+"use strict";
 
-function setBg(data){document.getElementById("dailyCard").style.setProperty("--daily-bg","url('"+data+"')");}
-var saved=localStorage.getItem(bgKey); if(saved)setBg(saved);
-document.getElementById("picker").onchange=function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{localStorage.setItem(bgKey,r.result)}catch(x){}setBg(r.result)};r.readAsDataURL(f)};
+var defaultSymbols=["AAPL","MSFT","NVDA","AMZN","TSLA","GOOG"];
+var symbols=null;
 
-function editStocks(){var cur=localStorage.getItem(stockKey)||"AAPL,MSFT,NVDA,AMZN,TSLA,GOOG";var v=prompt("Enter stock symbols separated by commas:",cur);if(v!==null){localStorage.setItem(stockKey,v.toUpperCase().replace(/[^A-Z0-9,]/g,""));loadStocks()}}
-function loadStocks(){var s=(localStorage.getItem(stockKey)||"AAPL,MSFT,NVDA,AMZN,TSLA,GOOG").split(",").filter(Boolean);document.getElementById("stocks").innerHTML=s.map(function(x){return "<tr><td><b>"+x+"</b></td><td id='p_"+x+"'>--</td><td id='c_"+x+"'>--</td></tr>"}).join("");s.forEach(fetchStock)}
-function fetchStock(sym){var u="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(sym)+"?range=1d&interval=1d";fetch(u).then(function(r){return r.json()}).then(function(j){var m=j.chart.result[0].meta,last=m.regularMarketPrice,prev=m.previousClose,ch=last-prev,pct=ch/prev*100;document.getElementById("p_"+sym).textContent=last.toFixed(2);var c=document.getElementById("c_"+sym);c.textContent=(ch>=0?"+":"")+ch.toFixed(2)+" ("+(ch>=0?"+":"")+pct.toFixed(2)+"%)";c.className=ch>=0?"up":"down"}).catch(function(){})}
-loadStocks();
+function getStorage(key){
+  try{return window.localStorage.getItem(key)}catch(e){return null}
+}
+function setStorage(key,value){
+  try{window.localStorage.setItem(key,value);return true}catch(e){return false}
+}
+function pad(n){return n<10?"0"+n:String(n)}
+function escapeHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
 
-function weatherCode(c){var a={0:"Clear",1:"Mainly clear",2:"Partly cloudy",3:"Overcast",45:"Fog",48:"Rime fog",51:"Light drizzle",53:"Drizzle",55:"Heavy drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",71:"Light snow",73:"Snow",75:"Heavy snow",80:"Rain showers",81:"Rain showers",82:"Heavy showers",95:"Thunderstorms",96:"Thunderstorms",99:"Thunderstorms"};return a[c]||"Current conditions"}
+/* ---------- CLOCK ---------- */
+function updateClock(){
+  var d=new Date(),h=d.getHours(),m=d.getMinutes(),ap=h>=12?"PM":"AM";
+  h=h%12;if(h===0)h=12;
+  document.getElementById("clock").innerHTML=h+":"+pad(m)+" <span class='ampm'>"+ap+"</span>";
+  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  document.getElementById("date").innerHTML=days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
+}
+updateClock();
+window.setInterval(updateClock,1000);
+
+/* ---------- GENERIC XHR ---------- */
+function xhr(url,ok,fail){
+  var x;
+  try{
+    x=new XMLHttpRequest();
+    x.onreadystatechange=function(){
+      if(x.readyState===4){
+        if(x.status>=200 && x.status<300){
+          try{ok(JSON.parse(x.responseText))}catch(e){if(fail)fail()}
+        }else if(fail){fail()}
+      }
+    };
+    x.open("GET",url,true);
+    x.send(null);
+  }catch(e){if(fail)fail()}
+}
+
+/* ---------- WEATHER ---------- */
+function weatherText(code){
+  if(code===0)return ["Sunny","☀"];
+  if(code<=3)return ["Partly Cloudy","◐"];
+  if(code<=48)return ["Cloudy","☁"];
+  if(code<=67)return ["Rain","☂"];
+  if(code<=77)return ["Snow","❄"];
+  if(code<=82)return ["Showers","☂"];
+  return ["Storms","⚡"];
+}
+function setPlace(city,state){
+  var label=city||"Current Location";
+  if(state)label+=", "+state;
+  document.getElementById("weatherPlace").innerHTML=escapeHtml(label);
+}
 function loadWeather(lat,lon){
-var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&forecast_days=5&timezone=auto";
-fetch(url).then(function(r){return r.json()}).then(function(j){document.getElementById("temp").textContent=Math.round(j.current.temperature_2m)+"°";document.getElementById("condition").textContent=weatherCode(j.current.weather_code);document.getElementById("wdetail").textContent="Feels like "+Math.round(j.current.apparent_temperature)+"°";var days=j.daily.time;document.getElementById("forecast").innerHTML=days.map(function(d,i){var x=new Date(d+"T12:00:00");return "<div class='day'>"+x.toLocaleDateString([], {weekday:"short"})+"<b>"+Math.round(j.daily.temperature_2m_max[i])+"° / "+Math.round(j.daily.temperature_2m_min[i])+"°</b>"+weatherCode(j.daily.weather_code[i])+"</div>"}).join("")});
+  var url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(lat)+
+    "&longitude="+encodeURIComponent(lon)+
+    "&current=temperature_2m,apparent_temperature,weather_code"+
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min"+
+    "&temperature_unit=fahrenheit&timezone=auto&forecast_days=5";
+  xhr(url,function(d){
+    if(!d.current)return;
+    var c=d.current,w=weatherText(c.weather_code),days=d.daily;
+    document.getElementById("temp").innerHTML=Math.round(c.temperature_2m)+"°";
+    document.getElementById("weatherIcon").innerHTML=w[1];
+    document.getElementById("condition").innerHTML=w[0];
+    if(days && days.temperature_2m_max){
+      document.getElementById("highlow").innerHTML=
+        "Feels Like: "+Math.round(c.apparent_temperature)+"°<br>"+
+        "High: "+Math.round(days.temperature_2m_max[0])+"°<br>"+
+        "Low: "+Math.round(days.temperature_2m_min[0])+"°";
+      var out="",i,dt,wn;
+      var dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      for(i=0;i<days.time.length;i++){
+        dt=new Date(days.time[i]+"T12:00:00");
+        wn=weatherText(days.weather_code[i]);
+        out+="<div class='fc'><b>"+dayNames[dt.getDay()]+"</b><i>"+wn[1]+"</i>"+
+          Math.round(days.temperature_2m_max[i])+"° / "+Math.round(days.temperature_2m_min[i])+"°</div>";
+      }
+      document.getElementById("forecast").innerHTML=out;
+    }
+    document.getElementById("weatherUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
+  },function(){
+    document.getElementById("condition").innerHTML="Weather unavailable";
+    document.getElementById("weatherUpdated").innerHTML="";
+  });
 }
-function geo(){if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(function(p){var lat=p.coords.latitude,lon=p.coords.longitude;loadWeather(lat,lon);fetch("https://geocoding-api.open-meteo.com/v1/reverse?latitude="+lat+"&longitude="+lon+"&count=1&language=en&format=json").then(function(r){return r.json()}).then(function(j){if(j.results&&j.results[0]){var x=j.results[0];document.getElementById("place").textContent=(x.name||"Current Location")+(x.admin1?", "+x.admin1:"")}}).catch(function(){})},function(){document.getElementById("condition").textContent="Location permission needed"});}
-geo();
+function locate(){
+  if(!navigator.geolocation){
+    setPlace("Current Location","");
+    document.getElementById("condition").innerHTML="Location not available";
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(p){
+    loadWeather(p.coords.latitude,p.coords.longitude);
+    var rurl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+
+      encodeURIComponent(p.coords.latitude)+"&longitude="+encodeURIComponent(p.coords.longitude)+
+      "&localityLanguage=en";
+    xhr(rurl,function(d){
+      var city=d.city||d.locality||d.localityInfo&&d.localityInfo.administrative&&
+        d.localityInfo.administrative[2]&&d.localityInfo.administrative[2].name||"Current Location";
+      var state=d.principalSubdivisionCode||"";
+      if(state.indexOf("-")>=0)state=state.split("-")[1];
+      if(!state && d.principalSubdivision && d.principalSubdivision.length<=3)state=d.principalSubdivision;
+      setPlace(city,state);
+    },function(){setPlace("Current Location","")});
+  },function(){
+    setPlace("Location unavailable","");
+    document.getElementById("condition").innerHTML="Allow Location access for local weather";
+  });
+}
+locate();
 
-var fallback={};
-fallback["2026-09-08"]={verse:"Jehovah kept warning Israel and Judah through all his prophets.",ref:"— 2 Ki. 17:13.",comment:"Jehovah often used his prophets to warn and correct his people. For example, God said through Jeremiah: “Return, O renegade Israel . . . I will not look down angrily on you, for I am loyal . . . I will not stay resentful forever. Only acknowledge your guilt, for you have rebelled against Jehovah.” By means of Joel, Jehovah said: “Return to me with all your hearts.” He had Isaiah declare: “Make yourselves clean; remove your evil deeds from my sight; stop doing bad.” And by means of Ezekiel, Jehovah asked: “Do I take any pleasure at all in the death of a wicked person? . . . Do I not prefer that he turn away from his ways and keep living? I do not take any pleasure in the death of anyone, . . . so turn back and live.” Jehovah takes delight in seeing people repent because he wants them to keep living—forever!"};
-function renderDaily(d){document.getElementById("verse").textContent=d.verse;document.getElementById("ref").textContent=d.ref;document.getElementById("comment").textContent=d.comment}
-function loadDaily(){
-var now=new Date(), y=now.getFullYear(),m=now.getMonth()+1,day=now.getDate(),key=y+"-"+String(m).padStart(2,"0")+"-"+String(day).padStart(2,"0");
-if(fallback[key])renderDaily(fallback[key]);
-var cache=localStorage.getItem("dddDaily");if(cache){try{var c=JSON.parse(cache);if(c.key===key)renderDaily(c.data)}catch(e){}}
-var url="https://wol.jw.org/en/wol/dt/r1/lp-e/"+y+"/"+m+"/"+day;
-fetch(url).then(function(r){return r.text()}).then(function(t){
-var title=t.match(/<h2[^>]*>\\s*[^<]*\\s*<\\/h2>/i); // WOL HTML varies; use visible text heuristics below
-var plain=t.replace(/<script[\\s\\S]*?<\\/script>/gi," ").replace(/<style[\\s\\S]*?<\\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\\s+/g," ").trim();
-var mt=plain.match(/Examining the Scriptures Daily—\\d{4}\\s+[^.]+\\.\\s*—\\s*[^.]+\\./);
-if(!mt)throw 0;
-var text=mt[0].replace(/^Examining the Scriptures Daily—\\d{4}\\s+/,"");
-var dash=text.lastIndexOf("—");var verse=text.slice(0,dash).trim();var ref=text.slice(dash+1).trim();
-var start=plain.indexOf(text)+text.length;var tail=plain.slice(start).replace(/^\\s+/,"");var end=tail.search(/\\bw\\d{2}\\.\\d{2}/);if(end>0)tail=tail.slice(0,end);var data={verse:verse.replace(/\\.$/,""),ref:ref,comment:tail.trim()};
-if(data.verse.length>10){renderDaily(data);localStorage.setItem("dddDaily",JSON.stringify({key:key,data:data}))}
-}).catch(function(){});
+/* ---------- DAILY TEXT ---------- */
+/* Sept. 8, 2026 is included as a guaranteed fallback so the dashboard
+   still shows today's entry when an external site cannot be reached. */
+var dailyFallback={
+  date:"2026-09-08",
+  label:"Tuesday, September 8, 2026",
+  scripture:"Jehovah kept warning Israel and Judah through all his prophets.",
+  ref:"— 2 Kings 17:13",
+  comment:"Jehovah often used his prophets to warn and correct his people. For example, God said through Jeremiah: “Return, O renegade Israel . . . I will not look down angrily on you, for I am loyal . . . I will not stay resentful forever. Only acknowledge your guilt, for you have rebelled against Jehovah.” (Jer. 3:12, 13) By means of Joel, Jehovah said: “Return to me with all your hearts.” (Joel 2:12, 13) He had Isaiah declare: “Make yourselves clean; remove your evil deeds from my sight; stop doing bad.” (Isa. 1:16-19) And by means of Ezekiel, Jehovah asked: “Do I take any pleasure at all in the death of a wicked person? . . . Do I not prefer that he turn away from his ways and keep living? I do not take any pleasure in the death of anyone, . . . so turn back and live.” (Ezek. 18:23, 32) Jehovah takes delight in seeing people repent because he wants them to keep living—for ever!"
+};
+
+function isoDate(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function prettyDailyDate(d){
+  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
 }
-loadDaily();setInterval(loadDaily,3600000);
+function applyDaily(e){
+  document.getElementById("dailyDate").innerHTML=escapeHtml(e.label);
+  document.getElementById("scripture").innerHTML=escapeHtml(e.scripture);
+  document.getElementById("dailyRef").innerHTML=escapeHtml(e.ref);
+  document.getElementById("comment").innerHTML=escapeHtml(e.comment);
+}
+function getDailyCache(){
+  var raw=getStorage("dailyTextCache");
+  if(!raw)return null;
+  try{return JSON.parse(raw)}catch(e){return null}
+}
+function saveDaily(e){setStorage("dailyTextCache",JSON.stringify(e))}
+
+function parseDailyText(raw,d){
+  var text=String(raw)
+    .replace(/<script[\s\S]*?<\/script>/gi," ")
+    .replace(/<style[\s\S]*?<\/style>/gi," ")
+    .replace(/<[^>]+>/g," ")
+    .replace(/&nbsp;/gi," ")
+    .replace(/&quot;/gi,'"')
+    .replace(/&#39;/gi,"'")
+    .replace(/&amp;/gi,"&")
+    .replace(/\s+/g," ").replace(/^\s+|\s+$/g,"");
+
+  var marker="Examining the Scriptures Daily—"+d.getFullYear();
+  var pos=text.indexOf(marker);
+  if(pos<0)pos=text.indexOf("Examining the Scriptures Daily");
+  if(pos<0)throw "Daily marker not found";
+
+  var tail=text.substring(pos);
+  var dateNeedle=monthsName(d.getMonth())+" "+d.getDate();
+  var p=tail.indexOf(dateNeedle);
+  if(p<0)throw "Date not found";
+
+  var chunk=tail.substring(p,p+5000);
+  var yearStart=chunk.indexOf(String(d.getFullYear()));
+  if(yearStart>=0)chunk=chunk.substring(yearStart+4);
+  chunk=chunk.replace(/^\s+[-—]\s+/," ");
+
+  var quote=chunk.match(/[“"]([^”"]+)[”"]/);
+  if(!quote)throw "Verse not found";
+
+  var q=quote[1];
+  var before=chunk.substring(0,quote.index+quote[0].length);
+  var refMatch=before.match(/(?:—|-\s*)([1-3]?\s?[A-Za-z]+\s+\d+:\d+(?:-\d+)?)/);
+  var ref=refMatch?refMatch[1]:"";
+
+  var cStart=chunk.indexOf("Jehovah",quote.index+quote[0].length);
+  if(cStart<0)cStart=quote.index+quote[0].length;
+  var comment=chunk.substring(cStart).replace(/\s+/g," ");
+  var end=comment.indexOf(" w2");
+  if(end>200)comment=comment.substring(0,end);
+
+  return {
+    date:isoDate(d),
+    label:prettyDailyDate(d),
+    scripture:q,
+    ref:ref?"— "+ref:"",
+    comment:comment
+  };
+}
+function monthsName(i){
+  return ["January","February","March","April","May","June","July","August","September","October","November","December"][i];
+}
+function loadDaily(){
+  var d=new Date(),today=isoDate(d),cached=getDailyCache();
+  var url="https://wol.jw.org/en/wol/dt/r1/lp-e/"+d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();
+
+  function finish(){
+    if(cached && cached.date===today){applyDaily(cached);return}
+    if(today===dailyFallback.date){applyDaily(dailyFallback);return}
+    if(cached){applyDaily(cached);return}
+    document.getElementById("dailyDate").innerHTML=prettyDailyDate(d);
+    document.getElementById("scripture").innerHTML="Daily Text unavailable";
+    document.getElementById("dailyRef").innerHTML="";
+    document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
+  }
+  function attempt(u,next){
+    var x;
+    try{
+      x=new XMLHttpRequest();
+      x.onreadystatechange=function(){
+        if(x.readyState===4){
+          if(x.status>=200 && x.status<300){
+            try{
+              var e=parseDailyText(x.responseText,d);
+              saveDaily(e);applyDaily(e);return;
+            }catch(ignore){}
+          }
+          if(next)next();
+          else finish();
+        }
+      };
+      x.open("GET",u,true);x.send(null);
+    }catch(err){if(next)next();else finish()}
+  }
+
+  attempt(url,function(){
+    attempt("https://r.jina.ai/"+url,function(){
+      attempt("https://api.allorigins.win/raw?url="+encodeURIComponent(url),null);
+    });
+  });
+}
+loadDaily();
+window.setInterval(loadDaily,1800000);
+
+/* ---------- DAILY PICTURE ---------- */
+/* Tiny built-in SVGs avoid a huge base64 image payload, which is important
+   for older Safari. A camera-roll picture can replace the default and is
+   saved locally. */
+var defaultScenes=[
+  "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#071a33'/><stop offset='1' stop-color='#02060c'/></linearGradient></defs><rect width='1200' height='800' fill='url(#g)'/><circle cx='930' cy='180' r='95' fill='#dbe9f5' opacity='.8'/><path d='M0 620 L260 390 L430 560 L650 300 L1200 650 L1200 800 L0 800Z' fill='#07111d'/><path d='M0 690 L300 520 L510 650 L780 470 L1200 700 L1200 800 L0 800Z' fill='#0b2135'/></svg>"),
+  "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#02152a'/><stop offset='1' stop-color='#02070d'/></linearGradient></defs><rect width='1200' height='800' fill='url(#g)'/><circle cx='200' cy='170' r='70' fill='#cfe8ff' opacity='.7'/><g fill='#fff' opacity='.8'><circle cx='380' cy='120' r='3'/><circle cx='600' cy='220' r='2'/><circle cx='820' cy='120' r='3'/><circle cx='1000' cy='280' r='2'/><circle cx='720' cy='360' r='2'/><circle cx='460' cy='330' r='2'/></g><path d='M0 650 Q250 540 500 640 T1200 620 L1200 800 L0 800Z' fill='#07101b'/></svg>")
+];
+function applySavedPhoto(){
+  var p=getStorage("dailyTextPhoto");
+  if(p)document.getElementById("dailyCard").style.backgroundImage="url('"+p+"')";
+  else document.getElementById("dailyCard").style.backgroundImage="url('"+defaultScenes[Math.floor(Math.random()*defaultScenes.length)]+"')";
+}
+applySavedPhoto();
+
+document.getElementById("choosePhoto").onclick=function(){
+  document.getElementById("photoInput").click();
+};
+document.getElementById("photoInput").onchange=function(){
+  var file=this.files&&this.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var max=1000,w=img.width,h=img.height;
+      if(w>max||h>max){
+        if(w>=h){h=Math.round(h*max/w);w=max}
+        else{w=Math.round(w*max/h);h=max}
+      }
+      var c=document.createElement("canvas");
+      c.width=w;c.height=h;
+      var ctx=c.getContext("2d");
+      ctx.drawImage(img,0,0,w,h);
+      var data=c.toDataURL("image/jpeg",0.72);
+      document.getElementById("dailyCard").style.backgroundImage="url('"+data+"')";
+      if(!setStorage("dailyTextPhoto",data)){
+        alert("The picture is being displayed, but this device could not save it for the next visit.");
+      }
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+/* ---------- STOCKS ---------- */
+function loadSavedSymbols(){
+  var raw=getStorage("deskStocks");
+  if(raw){
+    try{symbols=JSON.parse(raw)}catch(e){symbols=null}
+  }
+  if(!symbols||!symbols.length)symbols=defaultSymbols.slice(0);
+}
+function renderStocks(){
+  var html="",i,s;
+  for(i=0;i<symbols.length;i++){
+    s=String(symbols[i]).toUpperCase().replace(/[^A-Z0-9.\-]/g,"");
+    if(!s)continue;
+    html+="<div class='stockRow' data-symbol='"+escapeHtml(s)+"'><b>"+escapeHtml(s)+
+      "</b><span class='price'>--</span><span class='changeCol'>--</span><span class='pct'>--</span></div>";
+  }
+  document.getElementById("stockRows").innerHTML=html;
+}
+function loadOneStock(s,row){
+  var url="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(s)+"?range=1d&interval=1m";
+  xhr(url,function(d){
+    var r=d.chart&&d.chart.result&&d.chart.result[0],q=r&&r.meta;
+    if(!q||q.regularMarketPrice==null)return;
+    var price=q.regularMarketPrice,prev=q.chartPreviousClose;
+    if(prev==null)return;
+    var ch=price-prev,pct=(ch/prev)*100,up=ch>=0;
+    row.getElementsByClassName("price")[0].innerHTML=price.toFixed(2);
+    row.getElementsByClassName("changeCol")[0].innerHTML=(up?"+":"-")+Math.abs(ch).toFixed(2);
+    row.getElementsByClassName("pct")[0].innerHTML=(up?"+":"-")+Math.abs(pct).toFixed(2)+"%";
+    row.getElementsByClassName("changeCol")[0].className="changeCol "+(up?"up":"down");
+    row.getElementsByClassName("pct")[0].className="pct "+(up?"up":"down");
+  },function(){});
+}
+function refreshStocks(){
+  renderStocks();
+  var rows=document.getElementById("stockRows").getElementsByTagName("div"),i;
+  for(i=0;i<rows.length;i++)loadOneStock(rows[i].getAttribute("data-symbol"),rows[i]);
+  document.getElementById("stockUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
+}
+loadSavedSymbols();
+refreshStocks();
+window.setInterval(refreshStocks,300000);
+
+document.getElementById("editStocks").onclick=function(){
+  document.getElementById("symbols").value=symbols.join(",");
+  document.getElementById("stockModal").style.display="flex";
+};
+document.getElementById("cancelStocks").onclick=function(){
+  document.getElementById("stockModal").style.display="none";
+};
+document.getElementById("saveStocks").onclick=function(){
+  var a=document.getElementById("symbols").value.split(","),clean=[],i,s;
+  for(i=0;i<a.length;i++){
+    s=a[i].replace(/^\s+|\s+$/g,"").toUpperCase();
+    if(s&&clean.indexOf(s)<0)clean.push(s);
+  }
+  if(clean.length){
+    symbols=clean;
+    setStorage("deskStocks",JSON.stringify(symbols));
+    refreshStocks();
+  }
+  document.getElementById("stockModal").style.display="none";
+};
+
+})();
 </script>
-</body></html>
+</body>
+</html>
