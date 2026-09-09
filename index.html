@@ -88,7 +88,7 @@ body{min-height:100vh;overflow:hidden}
     <input id="photoInput" type="file" accept="image/*" style="display:none">
   </section>
 
-  <div class="footer">Daily Desk Dashboard — v2.2</div>
+  <div class="footer">Daily Desk Dashboard — v2.3</div>
 </div>
 
 <script>
@@ -179,36 +179,57 @@ function showWeatherUnavailable(msg){
   document.getElementById("condition").innerHTML=msg||"Weather unavailable";
   document.getElementById("weatherUpdated").innerHTML="";
 }
-function loadWeather(lat,lon,done){
-  var url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(lat)+
-    "&longitude="+encodeURIComponent(lon)+
-    "&current=temperature_2m,apparent_temperature,weather_code"+
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min"+
-    "&temperature_unit=fahrenheit&timezone=auto&forecast_days=5";
+function applyWeather(temp,feels,code,high,low,source,done){
+  var w=weatherText(code);
+  document.getElementById("temp").innerHTML=Math.round(temp)+"°";
+  document.getElementById("weatherIcon").innerHTML=w[1];
+  document.getElementById("condition").innerHTML=w[0];
+  document.getElementById("highlow").innerHTML="Feels Like: "+Math.round(feels)+"°<br>High: "+Math.round(high)+"°<br>Low: "+Math.round(low)+"°";
+  document.getElementById("forecast").innerHTML="";
+  document.getElementById("weatherUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
+  setStorage("lastWeather",JSON.stringify({temp:temp,feels:feels,code:code,high:high,low:low,source:source||"",updated:new Date().toString()}));
+  if(done)done(true);
+}
+function loadCachedWeather(){
+  var raw=getStorage("lastWeather"),d;
+  if(!raw)return false;
+  try{d=JSON.parse(raw);if(typeof d.temp!=="number")return false;applyWeather(d.temp,d.feels,d.code,d.high,d.low,d.source);return true}catch(e){return false}
+}
+function loadWeatherOpenMeteo(lat,lon,done){
+  var url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(lat)+"&longitude="+encodeURIComponent(lon)+"&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto&forecast_days=1";
   xhr(url,function(d){
-    if(!d.current){if(done)done(false);return;}
-    var c=d.current,w=weatherText(c.weather_code),days=d.daily;
-    document.getElementById("temp").innerHTML=Math.round(c.temperature_2m)+"°";
-    document.getElementById("weatherIcon").innerHTML=w[1];
-    document.getElementById("condition").innerHTML=w[0];
-    if(days && days.temperature_2m_max){
-      document.getElementById("highlow").innerHTML=
-        "Feels Like: "+Math.round(c.apparent_temperature)+"°<br>"+
-        "High: "+Math.round(days.temperature_2m_max[0])+"°<br>"+
-        "Low: "+Math.round(days.temperature_2m_min[0])+"°";
-      var out="",i,dt,wn;
-      var dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-      for(i=0;i<days.time.length;i++){
-        dt=new Date(days.time[i]+"T12:00:00");
-        wn=weatherText(days.weather_code[i]);
-        out+="<div class='fc'><b>"+dayNames[dt.getDay()]+"</b><i>"+wn[1]+"</i>"+
-          Math.round(days.temperature_2m_max[i])+"° / "+Math.round(days.temperature_2m_min[i])+"°</div>";
-      }
-      document.getElementById("forecast").innerHTML=out;
-    }
-    document.getElementById("weatherUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
-    if(done)done(true);
-  },function(){if(done)done(false)});
+    if(!d.current){done(false);return;}
+    var c=d.current,days=d.daily||{};
+    applyWeather(c.temperature_2m,c.apparent_temperature,c.weather_code,
+      days.temperature_2m_max&&days.temperature_2m_max.length?days.temperature_2m_max[0]:c.temperature_2m,
+      days.temperature_2m_min&&days.temperature_2m_min.length?days.temperature_2m_min[0]:c.temperature_2m,
+      "Open-Meteo",function(){done(true)});
+  },function(){done(false)});
+}
+function loadWeatherWttr(lat,lon,done){
+  var url="https://wttr.in/"+encodeURIComponent(lat)+","+encodeURIComponent(lon)+"?format=j1";
+  xhr(url,function(d){
+    try{
+      var c=d.current_condition&&d.current_condition[0],day=d.weather&&d.weather[0];
+      if(!c||!day){done(false);return;}
+      var temp=parseFloat(c.temp_F),feels=parseFloat(c.FeelsLikeF),high=parseFloat(day.maxtempF),low=parseFloat(day.mintempF),code=0;
+      var desc=(c.weatherDesc&&c.weatherDesc[0]&&c.weatherDesc[0].value||"").toLowerCase();
+      if(desc.indexOf("thunder")>=0)code=95;else if(desc.indexOf("snow")>=0)code=71;else if(desc.indexOf("rain")>=0||desc.indexOf("drizzle")>=0)code=61;else if(desc.indexOf("cloud")>=0||desc.indexOf("overcast")>=0)code=3;else code=0;
+      if(isNaN(temp)||isNaN(feels)){done(false);return}
+      if(isNaN(high))high=temp;if(isNaN(low))low=temp;
+      applyWeather(temp,feels,code,high,low,"wttr.in",function(){done(true)});
+    }catch(e){done(false)}
+  },function(){done(false)});
+}
+function loadWeather(lat,lon,done){
+  loadWeatherOpenMeteo(lat,lon,function(ok){
+    if(ok){if(done)done(true);return;}
+    loadWeatherWttr(lat,lon,function(ok2){
+      if(ok2){if(done)done(true);return;}
+      if(loadCachedWeather()){if(done)done(true);return;}
+      if(done)done(false);
+    });
+  });
 }
 function reverseGeocode(lat,lon,success,failure){
   var rurl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+
@@ -225,7 +246,7 @@ function useLocation(lat,lon,city,state){
   setPlace(city||"Current Location",state||"");
   saveLocation(lat,lon,city,state);
   loadWeather(lat,lon,function(ok){
-    if(!ok)showWeatherUnavailable("Weather service unavailable");
+    if(!ok && !loadCachedWeather())showWeatherUnavailable("Weather service unavailable");
   });
 }
 function ipFallback(){
