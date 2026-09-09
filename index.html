@@ -88,7 +88,7 @@ body{min-height:100vh;overflow:hidden}
     <input id="photoInput" type="file" accept="image/*" style="display:none">
   </section>
 
-  <div class="footer">Daily Desk Dashboard — v2.3</div>
+  <div class="footer">Daily Desk Dashboard — v2.4</div>
 </div>
 
 <script>
@@ -206,6 +206,40 @@ function loadWeatherOpenMeteo(lat,lon,done){
       "Open-Meteo",function(){done(true)});
   },function(){done(false)});
 }
+function loadWeatherNWS(lat,lon,done){
+  var purl="https://api.weather.gov/points/"+encodeURIComponent(lat)+","+encodeURIComponent(lon);
+  xhr(purl,function(d){
+    try{
+      var u=d.properties&&d.properties.forecastHourly;
+      if(!u){done(false);return;}
+      xhr(u,function(f){
+        try{
+          var a=f.properties&&f.properties.periods&&f.properties.periods[0];
+          if(!a){done(false);return;}
+          var temp=parseFloat(a.temperature), code=0, text=(a.shortForecast||"").toLowerCase();
+          if(text.indexOf("thunder")>=0)code=95;
+          else if(text.indexOf("snow")>=0||text.indexOf("sleet")>=0)code=71;
+          else if(text.indexOf("rain")>=0||text.indexOf("drizzle")>=0||text.indexOf("shower")>=0)code=61;
+          else if(text.indexOf("cloud")>=0||text.indexOf("overcast")>=0)code=3;
+          if(isNaN(temp)){done(false);return;}
+          var feels=temp, high=temp, low=temp;
+          applyWeather(temp,feels,code,high,low,"National Weather Service",function(){done(true)});
+        }catch(e){done(false)}
+      },function(){done(false)});
+    }catch(e){done(false)}
+  },function(){done(false)});
+}
+function loadWeatherGraySky(lat,lon,done){
+  var url="https://api.graysky.app/current?lat="+encodeURIComponent(lat)+"&lon="+encodeURIComponent(lon);
+  xhr(url,function(d){
+    try{
+      var temp=d.temperature, feels=(d.feels_like!=null?d.feels_like:temp), code=0, text=(d.summary||d.conditions||"").toLowerCase();
+      if(text.indexOf("thunder")>=0)code=95;else if(text.indexOf("snow")>=0)code=71;else if(text.indexOf("rain")>=0)code=61;else if(text.indexOf("cloud")>=0)code=3;
+      if(typeof temp!=="number"){done(false);return;}
+      applyWeather(temp,feels,code,temp,temp,"GraySky",function(){done(true)});
+    }catch(e){done(false)}
+  },function(){done(false)});
+}
 function loadWeatherWttr(lat,lon,done){
   var url="https://wttr.in/"+encodeURIComponent(lat)+","+encodeURIComponent(lon)+"?format=j1";
   xhr(url,function(d){
@@ -224,10 +258,16 @@ function loadWeatherWttr(lat,lon,done){
 function loadWeather(lat,lon,done){
   loadWeatherOpenMeteo(lat,lon,function(ok){
     if(ok){if(done)done(true);return;}
-    loadWeatherWttr(lat,lon,function(ok2){
-      if(ok2){if(done)done(true);return;}
-      if(loadCachedWeather()){if(done)done(true);return;}
-      if(done)done(false);
+    loadWeatherNWS(lat,lon,function(okN){
+      if(okN){if(done)done(true);return;}
+      loadWeatherWttr(lat,lon,function(ok2){
+        if(ok2){if(done)done(true);return;}
+        loadWeatherGraySky(lat,lon,function(ok3){
+          if(ok3){if(done)done(true);return;}
+          if(loadCachedWeather()){if(done)done(true);return;}
+          if(done)done(false);
+        });
+      });
     });
   });
 }
