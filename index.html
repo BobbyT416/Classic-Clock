@@ -4,445 +4,163 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<title>Daily Desk Dashboard</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Classic Clock</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#000;color:#f2f6fb;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
-body{min-height:100vh;overflow:hidden}
-.wrap{width:100%;max-width:1200px;height:100vh;margin:0 auto;padding:12px;display:flex;flex-direction:column}
-.topRow{display:flex;flex:0 0 32%;min-height:210px;margin:-6px}
-.card{position:relative;margin:6px;background:#081a2d;border:1px solid rgba(160,195,225,.35);border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden}
-.half{width:50%}
-.pad{padding:24px}
-.label{font-size:15px;letter-spacing:3px;color:#aebed0;margin-bottom:18px}
-.bigtime{font-size:68px;line-height:1;font-weight:300;letter-spacing:1px}
-.ampm{font-size:21px;font-weight:600;vertical-align:middle;margin-left:7px;letter-spacing:1px}
-.date{font-size:23px;color:#dce6f0;margin-top:18px}
-.place{font-size:28px;margin-top:4px}
-.temp{font-size:50px;font-weight:300;position:absolute;right:24px;top:48px}
-.weatherline{font-size:22px;color:#dbe5ef;margin-top:7px}
-.weathericon{font-size:34px;margin-top:12px}
-.details{font-size:16px;line-height:1.5;color:#c8d4df;margin-top:10px}
-.forecast{display:flex;flex-wrap:wrap;margin-top:12px}
-.fc{font-size:12px;text-align:center;color:#cbd7e2;min-width:65px;margin-right:8px;margin-bottom:6px}
-.fc i{display:block;font-style:normal;font-size:21px;margin:3px 0}
-.updated{font-size:11px;color:#8193a5;margin-top:7px}
-.daily{flex:1 1 auto;width:100%;min-height:0;background-position:center;background-size:cover;background-repeat:no-repeat;margin-top:6px}
-.daily:before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:linear-gradient(rgba(3,12,21,.42),rgba(3,12,21,.78));pointer-events:none}
-.dailyContent{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;min-height:0}
-.dailyDate{font-size:18px;color:#d1dce7;margin-bottom:14px}
-.scripture{font-size:30px;line-height:1.3;font-weight:500;max-width:1000px}
-.ref{font-size:19px;color:#d4e0eb;margin-top:8px}
-.comment{font-size:17px;line-height:1.55;color:#d0dae4;margin-top:16px;overflow:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;padding-right:8px}
-.change{position:absolute;right:18px;bottom:16px;z-index:3;background:rgba(5,18,32,.82);border:1px solid rgba(190,215,235,.4);border-radius:10px;color:#eef5fb;padding:8px 11px;font-size:13px}
-.footer{text-align:center;color:#5f7387;font-size:11px;padding:5px 0 4px;flex:0 0 auto}
+html,body{margin:0;padding:0;width:100%;height:100%;background:#02070d;color:#f4f7fb;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+body{overflow:hidden}
+#page{position:relative;width:100%;height:100vh;min-height:100vh;background-position:center center;background-size:cover;background-repeat:no-repeat;background-color:#02070d}
+#shade{position:absolute;left:0;right:0;top:0;bottom:0;background:linear-gradient(to bottom,rgba(2,9,17,.28) 0%,rgba(2,9,17,.34) 31%,rgba(2,9,17,.72) 58%,rgba(2,9,17,.86) 100%);pointer-events:none}
+#top{position:relative;z-index:2;height:33.333%;min-height:185px;text-align:center;padding:3.2vh 20px 0;border-bottom:1px solid rgba(220,235,248,.65);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+#date{font-size:27px;line-height:1.15;color:#f0f4f8;margin:0 0 1.5vh;font-weight:400}
+#clock{font-size:clamp(88px,12vw,170px);line-height:.9;font-weight:300;letter-spacing:1px;white-space:nowrap}
+#clock .ampm{font-size:.34em;font-weight:500;vertical-align:middle;margin-left:10px;letter-spacing:1px}
+#daily{position:relative;z-index:2;height:66.667%;padding:2.7vh 7vw 3.5vh;overflow:hidden;text-align:center;text-shadow:0 2px 7px rgba(0,0,0,.65)}
+#dailyContent{height:100%;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;overflow:hidden}
+#dailyHeading{font-size:15px;letter-spacing:4px;color:#b9c9d8;font-weight:400;margin:0 0 2.1vh;line-height:1.2;white-space:nowrap}
+#dailyDate{font-size:19px;color:#d7e1ea;margin:0 0 1.5vh;display:none}
+#scripture{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.25;font-style:italic;font-weight:400;max-width:1050px;margin:0 auto}
+#dailyRef{font-family:Georgia,"Times New Roman",serif;font-size:20px;color:#d5e0ea;margin-top:1vh}
+#comment{font-size:19px;line-height:1.48;color:#e0e7ed;max-width:1100px;margin:2.2vh auto 0;overflow:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;padding:0 8px 22px;text-align:center}
+#choosePhoto{position:absolute;right:14px;bottom:12px;z-index:5;background:rgba(3,13,24,.52);border:1px solid rgba(210,225,238,.28);border-radius:8px;color:#dce7ef;padding:6px 9px;font-size:11px;opacity:.55}
+#choosePhoto:active{opacity:1}
+#photoInput{display:none}
+#version{position:absolute;right:9px;bottom:5px;z-index:4;font-size:10px;color:rgba(220,230,240,.48)}
+.loading{color:#c6d2dd}
 @media(max-width:760px){
- body{overflow:auto}
- .wrap{height:auto;min-height:100vh;padding:7px}
- .topRow{display:flex;flex-direction:column;flex:0 0 auto;margin:-4px}
- .half{width:100%}
- .card{margin:4px;border-radius:18px}
- .topRow .card{min-height:205px}
- .pad{padding:20px}
- .bigtime{font-size:55px}
- .date{font-size:21px}
- .place{font-size:25px}
- .temp{font-size:45px;right:20px;top:45px}
- .daily{height:calc(100vh - 430px);min-height:430px;margin-top:4px}
- .scripture{font-size:27px}
- .comment{font-size:16px}
+ #top{padding-top:3vh;min-height:150px}
+ #date{font-size:20px;margin-bottom:2vh}
+ #clock{font-size:72px}
+ #daily{padding:2.8vh 5vw 4vh}
+ #dailyHeading{font-size:12px;letter-spacing:3px;margin-bottom:2.2vh}
+ #scripture{font-size:29px;line-height:1.28}
+ #dailyRef{font-size:18px}
+ #comment{font-size:17px;line-height:1.48;margin-top:2.2vh}
+}
+@media(max-height:500px){
+ #top{padding-top:2.5vh;min-height:125px}
+ #date{font-size:19px;margin-bottom:1.2vh}
+ #clock{font-size:64px}
+ #daily{padding-top:2vh}
+ #dailyHeading{margin-bottom:1.2vh}
+ #scripture{font-size:27px}
+ #dailyRef{font-size:17px;margin-top:.5vh}
+ #comment{font-size:15px;margin-top:1.3vh}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="topRow">
-    <section class="card half pad">
-      <div class="label">TIME</div>
-      <div id="clock" class="bigtime">--:--</div>
-      <div id="date" class="date">Loading date...</div>
-    </section>
-
-    <section class="card half pad">
-      <div class="label">WEATHER</div>
-      <div id="weatherPlace" class="place">Current Location</div>
-      <div id="temp" class="temp">--°</div>
-      <div id="weatherIcon" class="weathericon"></div>
-      <div id="condition" class="weatherline">Loading weather...</div>
-      <div id="highlow" class="details"></div>
-      <div id="forecast" class="forecast"></div>
-      <div id="weatherUpdated" class="updated"></div>
-    </section>
-  </div>
-
-  <section id="dailyCard" class="card daily pad">
-    <div class="dailyContent">
-      <div class="label">EXAMINING THE SCRIPTURES DAILY</div>
-      <div id="dailyDate" class="dailyDate">Loading Daily Text...</div>
-      <div id="scripture" class="scripture">Loading...</div>
-      <div id="dailyRef" class="ref"></div>
-      <div id="comment" class="comment"></div>
-    </div>
-    <button id="choosePhoto" class="change" type="button">Change Picture</button>
-    <input id="photoInput" type="file" accept="image/*" style="display:none">
+<div id="page">
+  <div id="shade"></div>
+  <section id="top">
+    <div id="date">Loading date...</div>
+    <div id="clock">--:--</div>
   </section>
-
-  <div class="footer">Daily Desk Dashboard — v2.4</div>
+  <section id="daily">
+    <div id="dailyContent">
+      <div id="dailyHeading">EXAMINING THE SCRIPTURES DAILY</div>
+      <div id="dailyDate"></div>
+      <div id="scripture" class="loading">Loading Daily Text...</div>
+      <div id="dailyRef"></div>
+      <div id="comment"></div>
+    </div>
+    <button id="choosePhoto" type="button">Change Picture</button>
+    <input id="photoInput" type="file" accept="image/*">
+  </section>
+  <div id="version">v2.5</div>
 </div>
-
 <script>
 (function(){
 "use strict";
-
-var defaultSymbols=["AAPL","MSFT","NVDA","AMZN","TSLA","GOOG"];
-var symbols=null;
-
-function getStorage(key){
-  try{return window.localStorage.getItem(key)}catch(e){return null}
-}
-function setStorage(key,value){
-  try{window.localStorage.setItem(key,value);return true}catch(e){return false}
-}
+function getStorage(key){try{return window.localStorage.getItem(key)}catch(e){return null}}
+function setStorage(key,value){try{window.localStorage.setItem(key,value);return true}catch(e){return false}}
 function pad(n){return n<10?"0"+n:String(n)}
-function escapeHtml(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
-
-/* ---------- CLOCK ---------- */
+function escapeHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;")}
 function updateClock(){
-  var d=new Date(),h=d.getHours(),m=d.getMinutes(),ap=h>=12?"PM":"AM";
-  h=h%12;if(h===0)h=12;
-  document.getElementById("clock").innerHTML=h+":"+pad(m)+" <span class='ampm'>"+ap+"</span>";
-  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  document.getElementById("date").innerHTML=days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
+ var d=new Date(),h=d.getHours(),m=d.getMinutes(),ap=h>=12?"PM":"AM";h=h%12;if(h===0)h=12;
+ document.getElementById("clock").innerHTML=h+":"+pad(m)+" <span class='ampm'>"+ap+"</span>";
+ var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+ var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+ document.getElementById("date").innerHTML=days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
 }
-updateClock();
-window.setInterval(updateClock,1000);
+updateClock();window.setInterval(updateClock,1000);
 
-/* ---------- GENERIC XHR ---------- */
-function xhr(url,ok,fail){
-  var x;
-  try{
-    x=new XMLHttpRequest();
-    x.onreadystatechange=function(){
-      if(x.readyState===4){
-        if(x.status>=200 && x.status<300){
-          try{ok(JSON.parse(x.responseText))}catch(e){if(fail)fail()}
-        }else if(fail){fail()}
-      }
-    };
-    x.open("GET",url,true);
-    x.send(null);
-  }catch(e){if(fail)fail()}
-}
-function xhrText(url,ok,fail){
-  var x;
-  try{
-    x=new XMLHttpRequest();
-    x.onreadystatechange=function(){
-      if(x.readyState===4){
-        if(x.status>=200 && x.status<300){ok(x.responseText)}
-        else if(fail){fail()}
-      }
-    };
-    x.open("GET",url,true);
-    x.send(null);
-  }catch(e){if(fail)fail()}
-}
-
-/* ---------- WEATHER ---------- */
-function weatherText(code){
-  if(code===0)return ["Sunny","☀"];
-  if(code<=3)return ["Partly Cloudy","◐"];
-  if(code<=48)return ["Cloudy","☁"];
-  if(code<=67)return ["Rain","☂"];
-  if(code<=77)return ["Snow","❄"];
-  if(code<=82)return ["Showers","☂"];
-  return ["Storms","⚡"];
-}
-function setPlace(city,state){
-  var label=city||"Current Location";
-  if(state)label+=", "+state;
-  document.getElementById("weatherPlace").innerHTML=escapeHtml(label);
-}
-function saveLocation(lat,lon,city,state){
-  setStorage("weatherLocation",JSON.stringify({lat:lat,lon:lon,city:city||"",state:state||""}));
-}
-function getSavedLocation(){
-  var raw=getStorage("weatherLocation");
-  if(!raw)return null;
-  try{return JSON.parse(raw)}catch(e){return null}
-}
-function showWeatherUnavailable(msg){
-  document.getElementById("condition").innerHTML=msg||"Weather unavailable";
-  document.getElementById("weatherUpdated").innerHTML="";
-}
-function applyWeather(temp,feels,code,high,low,source,done){
-  var w=weatherText(code);
-  document.getElementById("temp").innerHTML=Math.round(temp)+"°";
-  document.getElementById("weatherIcon").innerHTML=w[1];
-  document.getElementById("condition").innerHTML=w[0];
-  document.getElementById("highlow").innerHTML="Feels Like: "+Math.round(feels)+"°<br>High: "+Math.round(high)+"°<br>Low: "+Math.round(low)+"°";
-  document.getElementById("forecast").innerHTML="";
-  document.getElementById("weatherUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
-  setStorage("lastWeather",JSON.stringify({temp:temp,feels:feels,code:code,high:high,low:low,source:source||"",updated:new Date().toString()}));
-  if(done)done(true);
-}
-function loadCachedWeather(){
-  var raw=getStorage("lastWeather"),d;
-  if(!raw)return false;
-  try{d=JSON.parse(raw);if(typeof d.temp!=="number")return false;applyWeather(d.temp,d.feels,d.code,d.high,d.low,d.source);return true}catch(e){return false}
-}
-function loadWeatherOpenMeteo(lat,lon,done){
-  var url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(lat)+"&longitude="+encodeURIComponent(lon)+"&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto&forecast_days=1";
-  xhr(url,function(d){
-    if(!d.current){done(false);return;}
-    var c=d.current,days=d.daily||{};
-    applyWeather(c.temperature_2m,c.apparent_temperature,c.weather_code,
-      days.temperature_2m_max&&days.temperature_2m_max.length?days.temperature_2m_max[0]:c.temperature_2m,
-      days.temperature_2m_min&&days.temperature_2m_min.length?days.temperature_2m_min[0]:c.temperature_2m,
-      "Open-Meteo",function(){done(true)});
-  },function(){done(false)});
-}
-function loadWeatherNWS(lat,lon,done){
-  var purl="https://api.weather.gov/points/"+encodeURIComponent(lat)+","+encodeURIComponent(lon);
-  xhr(purl,function(d){
-    try{
-      var u=d.properties&&d.properties.forecastHourly;
-      if(!u){done(false);return;}
-      xhr(u,function(f){
-        try{
-          var a=f.properties&&f.properties.periods&&f.properties.periods[0];
-          if(!a){done(false);return;}
-          var temp=parseFloat(a.temperature), code=0, text=(a.shortForecast||"").toLowerCase();
-          if(text.indexOf("thunder")>=0)code=95;
-          else if(text.indexOf("snow")>=0||text.indexOf("sleet")>=0)code=71;
-          else if(text.indexOf("rain")>=0||text.indexOf("drizzle")>=0||text.indexOf("shower")>=0)code=61;
-          else if(text.indexOf("cloud")>=0||text.indexOf("overcast")>=0)code=3;
-          if(isNaN(temp)){done(false);return;}
-          var feels=temp, high=temp, low=temp;
-          applyWeather(temp,feels,code,high,low,"National Weather Service",function(){done(true)});
-        }catch(e){done(false)}
-      },function(){done(false)});
-    }catch(e){done(false)}
-  },function(){done(false)});
-}
-function loadWeatherGraySky(lat,lon,done){
-  var url="https://api.graysky.app/current?lat="+encodeURIComponent(lat)+"&lon="+encodeURIComponent(lon);
-  xhr(url,function(d){
-    try{
-      var temp=d.temperature, feels=(d.feels_like!=null?d.feels_like:temp), code=0, text=(d.summary||d.conditions||"").toLowerCase();
-      if(text.indexOf("thunder")>=0)code=95;else if(text.indexOf("snow")>=0)code=71;else if(text.indexOf("rain")>=0)code=61;else if(text.indexOf("cloud")>=0)code=3;
-      if(typeof temp!=="number"){done(false);return;}
-      applyWeather(temp,feels,code,temp,temp,"GraySky",function(){done(true)});
-    }catch(e){done(false)}
-  },function(){done(false)});
-}
-function loadWeatherWttr(lat,lon,done){
-  var url="https://wttr.in/"+encodeURIComponent(lat)+","+encodeURIComponent(lon)+"?format=j1";
-  xhr(url,function(d){
-    try{
-      var c=d.current_condition&&d.current_condition[0],day=d.weather&&d.weather[0];
-      if(!c||!day){done(false);return;}
-      var temp=parseFloat(c.temp_F),feels=parseFloat(c.FeelsLikeF),high=parseFloat(day.maxtempF),low=parseFloat(day.mintempF),code=0;
-      var desc=(c.weatherDesc&&c.weatherDesc[0]&&c.weatherDesc[0].value||"").toLowerCase();
-      if(desc.indexOf("thunder")>=0)code=95;else if(desc.indexOf("snow")>=0)code=71;else if(desc.indexOf("rain")>=0||desc.indexOf("drizzle")>=0)code=61;else if(desc.indexOf("cloud")>=0||desc.indexOf("overcast")>=0)code=3;else code=0;
-      if(isNaN(temp)||isNaN(feels)){done(false);return}
-      if(isNaN(high))high=temp;if(isNaN(low))low=temp;
-      applyWeather(temp,feels,code,high,low,"wttr.in",function(){done(true)});
-    }catch(e){done(false)}
-  },function(){done(false)});
-}
-function loadWeather(lat,lon,done){
-  loadWeatherOpenMeteo(lat,lon,function(ok){
-    if(ok){if(done)done(true);return;}
-    loadWeatherNWS(lat,lon,function(okN){
-      if(okN){if(done)done(true);return;}
-      loadWeatherWttr(lat,lon,function(ok2){
-        if(ok2){if(done)done(true);return;}
-        loadWeatherGraySky(lat,lon,function(ok3){
-          if(ok3){if(done)done(true);return;}
-          if(loadCachedWeather()){if(done)done(true);return;}
-          if(done)done(false);
-        });
-      });
-    });
-  });
-}
-function reverseGeocode(lat,lon,success,failure){
-  var rurl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+
-    encodeURIComponent(lat)+"&longitude="+encodeURIComponent(lon)+"&localityLanguage=en";
-  xhr(rurl,function(d){
-    var city=d.city||d.locality||"Current Location";
-    var state=d.principalSubdivisionCode||"";
-    if(state.indexOf("-")>=0)state=state.split("-")[1];
-    if(!state && d.principalSubdivision && d.principalSubdivision.length<=3)state=d.principalSubdivision;
-    success(city,state);
-  },failure);
-}
-function useLocation(lat,lon,city,state){
-  setPlace(city||"Current Location",state||"");
-  saveLocation(lat,lon,city,state);
-  loadWeather(lat,lon,function(ok){
-    if(!ok && !loadCachedWeather())showWeatherUnavailable("Weather service unavailable");
-  });
-}
-function ipFallback(){
-  /* BigDataCloud explicitly supports an IP-based fallback when browser GPS
-     coordinates are unavailable. This is especially useful on older Safari. */
-  var u="https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en";
-  xhr(u,function(d){
-    var lat=d.latitude,lon=d.longitude;
-    if(typeof lat!=="number" || typeof lon!=="number"){
-      showWeatherUnavailable("Location unavailable");
-      return;
-    }
-    var city=d.city||d.locality||"Current Location",state=d.principalSubdivisionCode||"";
-    if(state.indexOf("-")>=0)state=state.split("-")[1];
-    if(!state && d.principalSubdivision && d.principalSubdivision.length<=3)state=d.principalSubdivision;
-    useLocation(lat,lon,city,state);
-  },function(){showWeatherUnavailable("Location unavailable")});
-}
-function locate(){
-  var saved=getSavedLocation();
-  if(saved && typeof saved.lat==="number" && typeof saved.lon==="number"){
-    setPlace(saved.city||"Current Location",saved.state||"");
-    loadWeather(saved.lat,saved.lon,function(ok){
-      if(!ok)tryLiveLocation(saved);
-    });
-  }else{
-    tryLiveLocation(null);
-  }
-}
-function tryLiveLocation(saved){
-  if(!navigator.geolocation){ipFallback();return;}
-  navigator.geolocation.getCurrentPosition(function(p){
-    reverseGeocode(p.coords.latitude,p.coords.longitude,function(city,state){
-      useLocation(p.coords.latitude,p.coords.longitude,city,state);
-    },function(){
-      useLocation(p.coords.latitude,p.coords.longitude,saved?saved.city:"Current Location",saved?saved.state:"");
-    });
-  },function(){
-    if(saved){
-      loadWeather(saved.lat,saved.lon,function(ok){
-        if(!ok)ipFallback();
-      });
-    }else{
-      ipFallback();
-    }
-  },{enableHighAccuracy:false,timeout:15000,maximumAge:86400000});
-}
-locate();
-
-/* ---------- DAILY TEXT ---------- */
-/* v2.1: Daily Text is served from the same GitHub Pages site.
-   This avoids cross-site requests that are unreliable on iOS 9 Safari. */
-var dailyFallback={
-  date:"2026-09-09",
-  label:"Wednesday, September 9, 2026",
-  scripture:"All Scripture is inspired of God and beneficial.",
-  ref:"— 2 Timothy 3:16",
-  comment:"All of God’s people receive the spiritual nourishment, direction, and protection they need. An example of Jehovah’s impartiality is that he makes the Bible accessible to people around the globe today. The Holy Scriptures were originally written in three languages: Hebrew, Aramaic, and Greek. Do those who can read the original Bible languages have a closer relationship with Jehovah than those who cannot? No, they do not. (Matt. 11:25) Jehovah’s approval of us is not dependent on our secular education or on our ability with languages. Rather than offer his wisdom only to the highly educated, Jehovah makes it accessible to people around the earth, whether they are highly educated or not. His inspired Word, the Bible, has been translated into thousands of languages; thus, people the world over can benefit from its teachings and learn how they can become his friends.—2 Tim. 3:16, 17."
-};
 function isoDate(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 function prettyDailyDate(d){
-  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  return days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
+ var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+ var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+ return days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
 }
+var dailyFallback={
+ date:"2026-09-09",
+ label:"Wednesday, September 9, 2026",
+ scripture:"All Scripture is inspired of God and beneficial.",
+ ref:"— 2 Timothy 3:16",
+ comment:"All of God’s people receive the spiritual nourishment, direction, and protection they need. An example of Jehovah’s impartiality is that he makes the Bible accessible to people around the globe today. The Holy Scriptures were originally written in three languages: Hebrew, Aramaic, and Greek. Do those who can read the original Bible languages have a closer relationship with Jehovah than those who cannot? No, they do not. (Matt. 11:25) Jehovah’s approval of us is not dependent on our secular education or on our ability with languages. Rather than offer his wisdom only to the highly educated, Jehovah makes it accessible to people around the earth, whether they are highly educated or not. His inspired Word, the Bible, has been translated into thousands of languages; thus, people the world over can benefit from its teachings and learn how they can become his friends.—2 Tim. 3:16, 17."
+};
 function applyDaily(e){
-  document.getElementById("dailyDate").innerHTML=escapeHtml(e.label);
-  document.getElementById("scripture").innerHTML=escapeHtml(e.scripture);
-  document.getElementById("dailyRef").innerHTML=escapeHtml(e.ref);
-  document.getElementById("comment").innerHTML=escapeHtml(e.comment);
+ document.getElementById("dailyDate").innerHTML=escapeHtml(e.label||"");
+ document.getElementById("scripture").className="";
+ document.getElementById("scripture").innerHTML=escapeHtml(e.scripture||"");
+ document.getElementById("dailyRef").innerHTML=escapeHtml(e.ref||"");
+ document.getElementById("comment").innerHTML=escapeHtml(e.comment||"");
 }
 function getDailyCache(){var raw=getStorage("dailyTextCache");if(!raw)return null;try{return JSON.parse(raw)}catch(e){return null}}
 function saveDaily(e){setStorage("dailyTextCache",JSON.stringify(e))}
-function loadDaily(){
-  var d=new Date(),today=isoDate(d),cached=getDailyCache();
-  var currentFallback=(today===dailyFallback.date)?dailyFallback:null;
-  if(cached && cached.date===today){applyDaily(cached);return}
-  if(currentFallback){applyDaily(currentFallback)}
-  var u="dailytext.json?v="+today;
-  var x;
-  try{
-    x=new XMLHttpRequest();
-    x.onreadystatechange=function(){
-      if(x.readyState!==4)return;
-      if(x.status>=200 && x.status<300){
-        try{
-          var e=JSON.parse(x.responseText);
-          if(e && e.date===today && e.scripture && e.ref && e.comment){saveDaily(e);applyDaily(e);return;}
-        }catch(ignore){}
-      }
-      if(!currentFallback && !(cached && cached.date===today)){
-        document.getElementById("dailyDate").innerHTML=escapeHtml(prettyDailyDate(d));
-        document.getElementById("scripture").innerHTML="Daily Text unavailable";
-        document.getElementById("dailyRef").innerHTML="";
-        document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
-      }
-    };
-    x.open("GET",u,true);x.send(null);
-  }catch(err){
-    if(!currentFallback && !(cached && cached.date===today)){
-      document.getElementById("dailyDate").innerHTML=escapeHtml(prettyDailyDate(d));
-      document.getElementById("scripture").innerHTML="Daily Text unavailable";
-      document.getElementById("dailyRef").innerHTML="";
-      document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
-    }
-  }
+function showDailyUnavailable(d){
+ document.getElementById("dailyDate").innerHTML=escapeHtml(prettyDailyDate(d));
+ document.getElementById("scripture").className="";
+ document.getElementById("scripture").innerHTML="Daily Text unavailable";
+ document.getElementById("dailyRef").innerHTML="";
+ document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
 }
-loadDaily();
-window.setInterval(loadDaily,1800000);
+function loadDaily(){
+ var d=new Date(),today=isoDate(d),cached=getDailyCache();
+ if(cached&&cached.date===today){applyDaily(cached);return}
+ if(today===dailyFallback.date){applyDaily(dailyFallback)}
+ var x;
+ try{
+  x=new XMLHttpRequest();
+  x.onreadystatechange=function(){
+   if(x.readyState!==4)return;
+   if(x.status>=200&&x.status<300){
+    try{var e=JSON.parse(x.responseText);if(e&&e.date===today&&e.scripture&&e.ref&&e.comment){saveDaily(e);applyDaily(e);return;}}catch(ignore){}
+   }
+   if(today!==dailyFallback.date&&!(cached&&cached.date===today))showDailyUnavailable(d);
+  };
+  x.open("GET","dailytext.json?v="+today,true);x.send(null);
+ }catch(err){if(today!==dailyFallback.date&&!(cached&&cached.date===today))showDailyUnavailable(d)}
+}
+loadDaily();window.setInterval(loadDaily,1800000);
 
-/* ---------- DAILY PICTURE ---------- */
-/* Tiny built-in SVGs avoid a huge base64 image payload, which is important
-   for older Safari. A camera-roll picture can replace the default and is
-   saved locally. */
 var defaultScenes=[
-  "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#071a33'/><stop offset='1' stop-color='#02060c'/></linearGradient></defs><rect width='1200' height='800' fill='url(#g)'/><circle cx='930' cy='180' r='95' fill='#dbe9f5' opacity='.8'/><path d='M0 620 L260 390 L430 560 L650 300 L1200 650 L1200 800 L0 800Z' fill='#07111d'/><path d='M0 690 L300 520 L510 650 L780 470 L1200 700 L1200 800 L0 800Z' fill='#0b2135'/></svg>"),
-  "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#02152a'/><stop offset='1' stop-color='#02070d'/></linearGradient></defs><rect width='1200' height='800' fill='url(#g)'/><circle cx='200' cy='170' r='70' fill='#cfe8ff' opacity='.7'/><g fill='#fff' opacity='.8'><circle cx='380' cy='120' r='3'/><circle cx='600' cy='220' r='2'/><circle cx='820' cy='120' r='3'/><circle cx='1000' cy='280' r='2'/><circle cx='720' cy='360' r='2'/><circle cx='460' cy='330' r='2'/></g><path d='M0 650 Q250 540 500 640 T1200 620 L1200 800 L0 800Z' fill='#07101b'/></svg>")
+ "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#274f73'/><stop offset='.48' stop-color='#071a2d'/><stop offset='1' stop-color='#02070d'/></linearGradient></defs><rect width='1600' height='1000' fill='url(#g)'/><circle cx='1250' cy='300' r='120' fill='#ffd68a' opacity='.85'/><path d='M0 650 L330 360 L520 580 L850 300 L1600 680 L1600 1000 L0 1000Z' fill='#071321'/><path d='M0 760 L350 560 L620 700 L980 500 L1600 760 L1600 1000 L0 1000Z' fill='#0b2134'/></svg>"),
+ "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#193d61'/><stop offset='.55' stop-color='#041327'/><stop offset='1' stop-color='#01050b'/></linearGradient></defs><rect width='1600' height='1000' fill='url(#g)'/><circle cx='1180' cy='240' r='100' fill='#d8e8f5' opacity='.72'/><g fill='#fff' opacity='.8'><circle cx='340' cy='170' r='3'/><circle cx='590' cy='110' r='2'/><circle cx='820' cy='250' r='3'/><circle cx='1040' cy='130' r='2'/><circle cx='1350' cy='320' r='2'/></g><path d='M0 690 Q300 530 620 650 T1600 620 L1600 1000 L0 1000Z' fill='#07101b'/></svg>")
 ];
 function applySavedPhoto(){
-  var p=getStorage("dailyTextPhoto");
-  if(p)document.getElementById("dailyCard").style.backgroundImage="url('"+p+"')";
-  else document.getElementById("dailyCard").style.backgroundImage="url('"+defaultScenes[Math.floor(Math.random()*defaultScenes.length)]+"')";
+ var p=getStorage("dailyTextPhoto");
+ if(p)document.getElementById("page").style.backgroundImage="url('"+p+"')";
+ else document.getElementById("page").style.backgroundImage="url('"+defaultScenes[Math.floor(Math.random()*defaultScenes.length)]+"')";
 }
 applySavedPhoto();
-
-document.getElementById("choosePhoto").onclick=function(){
-  document.getElementById("photoInput").click();
-};
+document.getElementById("choosePhoto").onclick=function(){document.getElementById("photoInput").click()};
 document.getElementById("photoInput").onchange=function(){
-  var file=this.files&&this.files[0];
-  if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var img=new Image();
-    img.onload=function(){
-      var max=1000,w=img.width,h=img.height;
-      if(w>max||h>max){
-        if(w>=h){h=Math.round(h*max/w);w=max}
-        else{w=Math.round(w*max/h);h=max}
-      }
-      var c=document.createElement("canvas");
-      c.width=w;c.height=h;
-      var ctx=c.getContext("2d");
-      ctx.drawImage(img,0,0,w,h);
-      var data=c.toDataURL("image/jpeg",0.72);
-      document.getElementById("dailyCard").style.backgroundImage="url('"+data+"')";
-      if(!setStorage("dailyTextPhoto",data)){
-        alert("The picture is being displayed, but this device could not save it for the next visit.");
-      }
-    };
-    img.src=ev.target.result;
+ var file=this.files&&this.files[0];if(!file)return;
+ var reader=new FileReader();
+ reader.onload=function(ev){
+  var img=new Image();
+  img.onload=function(){
+   var max=1400,w=img.width,h=img.height;
+   if(w>max||h>max){if(w>=h){h=Math.round(h*max/w);w=max}else{w=Math.round(w*max/h);h=max}}
+   var c=document.createElement("canvas");c.width=w;c.height=h;var ctx=c.getContext("2d");ctx.drawImage(img,0,0,w,h);
+   var data=c.toDataURL("image/jpeg",0.72);document.getElementById("page").style.backgroundImage="url('"+data+"')";
+   if(!setStorage("dailyTextPhoto",data))alert("The picture is being displayed, but this device could not save it for the next visit.");
   };
-  reader.readAsDataURL(file);
+  img.src=ev.target.result;
+ };
+ reader.readAsDataURL(file);
 };
-
-
 })();
 </script>
 </body>
