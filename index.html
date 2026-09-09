@@ -88,7 +88,7 @@ body{min-height:100vh;overflow:hidden}
     <input id="photoInput" type="file" accept="image/*" style="display:none">
   </section>
 
-  <div class="footer">Daily Desk Dashboard — v2.1</div>
+  <div class="footer">Daily Desk Dashboard — v2.2</div>
 </div>
 
 <script>
@@ -167,14 +167,26 @@ function setPlace(city,state){
   if(state)label+=", "+state;
   document.getElementById("weatherPlace").innerHTML=escapeHtml(label);
 }
-function loadWeather(lat,lon){
+function saveLocation(lat,lon,city,state){
+  setStorage("weatherLocation",JSON.stringify({lat:lat,lon:lon,city:city||"",state:state||""}));
+}
+function getSavedLocation(){
+  var raw=getStorage("weatherLocation");
+  if(!raw)return null;
+  try{return JSON.parse(raw)}catch(e){return null}
+}
+function showWeatherUnavailable(msg){
+  document.getElementById("condition").innerHTML=msg||"Weather unavailable";
+  document.getElementById("weatherUpdated").innerHTML="";
+}
+function loadWeather(lat,lon,done){
   var url="https://api.open-meteo.com/v1/forecast?latitude="+encodeURIComponent(lat)+
     "&longitude="+encodeURIComponent(lon)+
     "&current=temperature_2m,apparent_temperature,weather_code"+
     "&daily=weather_code,temperature_2m_max,temperature_2m_min"+
     "&temperature_unit=fahrenheit&timezone=auto&forecast_days=5";
   xhr(url,function(d){
-    if(!d.current)return;
+    if(!d.current){if(done)done(false);return;}
     var c=d.current,w=weatherText(c.weather_code),days=d.daily;
     document.getElementById("temp").innerHTML=Math.round(c.temperature_2m)+"°";
     document.getElementById("weatherIcon").innerHTML=w[1];
@@ -195,34 +207,71 @@ function loadWeather(lat,lon){
       document.getElementById("forecast").innerHTML=out;
     }
     document.getElementById("weatherUpdated").innerHTML="Updated "+new Date().toLocaleTimeString();
-  },function(){
-    document.getElementById("condition").innerHTML="Weather unavailable";
-    document.getElementById("weatherUpdated").innerHTML="";
+    if(done)done(true);
+  },function(){if(done)done(false)});
+}
+function reverseGeocode(lat,lon,success,failure){
+  var rurl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+
+    encodeURIComponent(lat)+"&longitude="+encodeURIComponent(lon)+"&localityLanguage=en";
+  xhr(rurl,function(d){
+    var city=d.city||d.locality||"Current Location";
+    var state=d.principalSubdivisionCode||"";
+    if(state.indexOf("-")>=0)state=state.split("-")[1];
+    if(!state && d.principalSubdivision && d.principalSubdivision.length<=3)state=d.principalSubdivision;
+    success(city,state);
+  },failure);
+}
+function useLocation(lat,lon,city,state){
+  setPlace(city||"Current Location",state||"");
+  saveLocation(lat,lon,city,state);
+  loadWeather(lat,lon,function(ok){
+    if(!ok)showWeatherUnavailable("Weather service unavailable");
   });
 }
+function ipFallback(){
+  /* BigDataCloud explicitly supports an IP-based fallback when browser GPS
+     coordinates are unavailable. This is especially useful on older Safari. */
+  var u="https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=en";
+  xhr(u,function(d){
+    var lat=d.latitude,lon=d.longitude;
+    if(typeof lat!=="number" || typeof lon!=="number"){
+      showWeatherUnavailable("Location unavailable");
+      return;
+    }
+    var city=d.city||d.locality||"Current Location",state=d.principalSubdivisionCode||"";
+    if(state.indexOf("-")>=0)state=state.split("-")[1];
+    if(!state && d.principalSubdivision && d.principalSubdivision.length<=3)state=d.principalSubdivision;
+    useLocation(lat,lon,city,state);
+  },function(){showWeatherUnavailable("Location unavailable")});
+}
 function locate(){
-  if(!navigator.geolocation){
-    setPlace("Current Location","");
-    document.getElementById("condition").innerHTML="Location not available";
-    return;
+  var saved=getSavedLocation();
+  if(saved && typeof saved.lat==="number" && typeof saved.lon==="number"){
+    setPlace(saved.city||"Current Location",saved.state||"");
+    loadWeather(saved.lat,saved.lon,function(ok){
+      if(!ok)tryLiveLocation(saved);
+    });
+  }else{
+    tryLiveLocation(null);
   }
+}
+function tryLiveLocation(saved){
+  if(!navigator.geolocation){ipFallback();return;}
   navigator.geolocation.getCurrentPosition(function(p){
-    loadWeather(p.coords.latitude,p.coords.longitude);
-    var rurl="https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+
-      encodeURIComponent(p.coords.latitude)+"&longitude="+encodeURIComponent(p.coords.longitude)+
-      "&localityLanguage=en";
-    xhr(rurl,function(d){
-      var city=d.city||d.locality||d.localityInfo&&d.localityInfo.administrative&&
-        d.localityInfo.administrative[2]&&d.localityInfo.administrative[2].name||"Current Location";
-      var state=d.principalSubdivisionCode||"";
-      if(state.indexOf("-")>=0)state=state.split("-")[1];
-      if(!state && d.principalSubdivision && d.principalSubdivision.length<=3)state=d.principalSubdivision;
-      setPlace(city,state);
-    },function(){setPlace("Current Location","")});
+    reverseGeocode(p.coords.latitude,p.coords.longitude,function(city,state){
+      useLocation(p.coords.latitude,p.coords.longitude,city,state);
+    },function(){
+      useLocation(p.coords.latitude,p.coords.longitude,saved?saved.city:"Current Location",saved?saved.state:"");
+    });
   },function(){
-    setPlace("Location unavailable","");
-    document.getElementById("condition").innerHTML="Allow Location access for local weather";
-  });
+    if(saved){
+      loadWeather(saved.lat,saved.lon,function(ok){
+        if(!ok)ipFallback();
+      });
+    }else{
+      ipFallback();
+    }
+  },{enableHighAccuracy:false,timeout:15000,maximumAge:86400000});
 }
 locate();
 
