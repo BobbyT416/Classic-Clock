@@ -88,7 +88,7 @@ body{min-height:100vh;overflow:hidden}
     <input id="photoInput" type="file" accept="image/*" style="display:none">
   </section>
 
-  <div class="footer">Daily Desk Dashboard — v2.0</div>
+  <div class="footer">Daily Desk Dashboard — v2.1</div>
 </div>
 
 <script>
@@ -227,16 +227,15 @@ function locate(){
 locate();
 
 /* ---------- DAILY TEXT ---------- */
-/* Sept. 8, 2026 is included as a guaranteed fallback so the dashboard
-   still shows today's entry when an external site cannot be reached. */
+/* v2.1: Daily Text is served from the same GitHub Pages site.
+   This avoids cross-site requests that are unreliable on iOS 9 Safari. */
 var dailyFallback={
-  date:"2026-09-08",
-  label:"Tuesday, September 8, 2026",
-  scripture:"Jehovah kept warning Israel and Judah through all his prophets.",
-  ref:"— 2 Kings 17:13",
-  comment:"Jehovah often used his prophets to warn and correct his people. For example, God said through Jeremiah: “Return, O renegade Israel . . . I will not look down angrily on you, for I am loyal . . . I will not stay resentful forever. Only acknowledge your guilt, for you have rebelled against Jehovah.” (Jer. 3:12, 13) By means of Joel, Jehovah said: “Return to me with all your hearts.” (Joel 2:12, 13) He had Isaiah declare: “Make yourselves clean; remove your evil deeds from my sight; stop doing bad.” (Isa. 1:16-19) And by means of Ezekiel, Jehovah asked: “Do I take any pleasure at all in the death of a wicked person? . . . Do I not prefer that he turn away from his ways and keep living? I do not take any pleasure in the death of anyone, . . . so turn back and live.” (Ezek. 18:23, 32) Jehovah takes delight in seeing people repent because he wants them to keep living—for ever!"
+  date:"2026-09-09",
+  label:"Wednesday, September 9, 2026",
+  scripture:"All Scripture is inspired of God and beneficial.",
+  ref:"— 2 Timothy 3:16",
+  comment:"All of God’s people receive the spiritual nourishment, direction, and protection they need. An example of Jehovah’s impartiality is that he makes the Bible accessible to people around the globe today. The Holy Scriptures were originally written in three languages: Hebrew, Aramaic, and Greek. Do those who can read the original Bible languages have a closer relationship with Jehovah than those who cannot? No, they do not. (Matt. 11:25) Jehovah’s approval of us is not dependent on our secular education or on our ability with languages. Rather than offer his wisdom only to the highly educated, Jehovah makes it accessible to people around the earth, whether they are highly educated or not. His inspired Word, the Bible, has been translated into thousands of languages; thus, people the world over can benefit from its teachings and learn how they can become his friends.—2 Tim. 3:16, 17."
 };
-
 function isoDate(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 function prettyDailyDate(d){
   var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -249,127 +248,41 @@ function applyDaily(e){
   document.getElementById("dailyRef").innerHTML=escapeHtml(e.ref);
   document.getElementById("comment").innerHTML=escapeHtml(e.comment);
 }
-function getDailyCache(){
-  var raw=getStorage("dailyTextCache");
-  if(!raw)return null;
-  try{return JSON.parse(raw)}catch(e){return null}
-}
+function getDailyCache(){var raw=getStorage("dailyTextCache");if(!raw)return null;try{return JSON.parse(raw)}catch(e){return null}}
 function saveDaily(e){setStorage("dailyTextCache",JSON.stringify(e))}
-
-function parseDailyText(raw,d){
-  var text=String(raw)
-    .replace(/<script[\s\S]*?<\/script>/gi," ")
-    .replace(/<style[\s\S]*?<\/style>/gi," ")
-    .replace(/<[^>]+>/g," ")
-    .replace(/&nbsp;/gi," ")
-    .replace(/&quot;/gi,'"')
-    .replace(/&#39;/gi,"'")
-    .replace(/&amp;/gi,"&")
-    .replace(/\s+/g," ").replace(/^\s+|\s+$/g,"");
-
-  var marker="Examining the Scriptures Daily—"+d.getFullYear();
-  var markerPos=text.indexOf(marker);
-  if(markerPos<0) markerPos=text.indexOf("Examining the Scriptures Daily");
-  if(markerPos<0) throw "Daily marker not found";
-
-  var dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  var months=["January","February","March","April","May","June","July","August","September","October","November","December"];
-  var heading=dayNames[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate();
-  var headingPos=text.indexOf(heading,markerPos);
-  if(headingPos<0) throw "Daily date heading not found";
-
-  /* Only inspect the first part of the day's entry. This prevents the
-     parser from wandering into the congregation meeting schedule below it. */
-  var chunk=text.substring(headingPos,headingPos+3000);
-
-  /* The Daily Text verse is immediately followed by its Bible citation.
-     Require that citation so a meeting question such as “two families”
-     cannot be mistaken for the verse. */
-  var citation=/[—-]\s*((?:[1-3]\s*)?[A-Za-z]{2,12}\.?\s+\d+(?::\d+)(?:[-–]\d+)?)/.exec(chunk);
-  if(!citation) throw "Daily citation not found";
-
-  var citationStart=citation.index;
-  var verseArea=chunk.substring(0,citationStart);
-  var quoteMatches=[],m,re=/[“"]([^”"]{8,240})[”"]/g;
-  while((m=re.exec(verseArea))!==null) quoteMatches.push(m[1]);
-  if(!quoteMatches.length) throw "Daily verse not found";
-
-  /* Use the last quote immediately before the citation. */
-  var q=quoteMatches[quoteMatches.length-1];
-  if(q.length<8) throw "Daily verse too short";
-
-  var after=chunk.substring(citationStart+citation[0].length);
-  var nextHeading=after.search(/\b[A-Z][A-Z ]{5,}\b/);
-  if(nextHeading>2000) after=after.substring(0,nextHeading);
-  var comment=after.replace(/^[\s.,;:—-]+/,"").replace(/\s+/g," ").trim();
-
-  /* Remove obvious meeting-schedule contamination if it ever appears. */
-  var bad=["FAMILY WORSHIP IDEA","TREASURES FROM GOD'S WORD","APPLY YOURSELF TO THE FIELD MINISTRY","LIVING AS CHRISTIANS"];
-  var bi,i;
-  for(i=0;i<bad.length;i++){
-    bi=comment.indexOf(bad[i]);
-    if(bi>100) comment=comment.substring(0,bi).trim();
-  }
-
-  return {
-    date:isoDate(d),
-    label:prettyDailyDate(d),
-    scripture:q,
-    ref:"— "+citation[1].replace(/\s+/g," "),
-    comment:comment
-  };
-}
-function monthsName(i){
-  return ["January","February","March","April","May","June","July","August","September","October","November","December"][i];
-}
 function loadDaily(){
   var d=new Date(),today=isoDate(d),cached=getDailyCache();
-
-  /* Never let a bad scrape replace a known-good Daily Text. */
-  if(today===dailyFallback.date){
-    applyDaily(dailyFallback);
-  }else if(cached && cached.date===today){
-    applyDaily(cached);
-  }
-
-  var url="https://wol.jw.org/en/wol/dt/r1/lp-e/"+d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();
-
-  function finish(){
-    if(today===dailyFallback.date){applyDaily(dailyFallback);return}
-    if(cached && cached.date===today){applyDaily(cached);return}
-    if(!document.getElementById("scripture").innerHTML ||
-       document.getElementById("scripture").innerHTML==="Loading..."){
-      document.getElementById("dailyDate").innerHTML=prettyDailyDate(d);
+  var currentFallback=(today===dailyFallback.date)?dailyFallback:null;
+  if(cached && cached.date===today){applyDaily(cached);return}
+  if(currentFallback){applyDaily(currentFallback)}
+  var u="dailytext.json?v="+today;
+  var x;
+  try{
+    x=new XMLHttpRequest();
+    x.onreadystatechange=function(){
+      if(x.readyState!==4)return;
+      if(x.status>=200 && x.status<300){
+        try{
+          var e=JSON.parse(x.responseText);
+          if(e && e.date===today && e.scripture && e.ref && e.comment){saveDaily(e);applyDaily(e);return;}
+        }catch(ignore){}
+      }
+      if(!currentFallback && !(cached && cached.date===today)){
+        document.getElementById("dailyDate").innerHTML=escapeHtml(prettyDailyDate(d));
+        document.getElementById("scripture").innerHTML="Daily Text unavailable";
+        document.getElementById("dailyRef").innerHTML="";
+        document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
+      }
+    };
+    x.open("GET",u,true);x.send(null);
+  }catch(err){
+    if(!currentFallback && !(cached && cached.date===today)){
+      document.getElementById("dailyDate").innerHTML=escapeHtml(prettyDailyDate(d));
       document.getElementById("scripture").innerHTML="Daily Text unavailable";
       document.getElementById("dailyRef").innerHTML="";
       document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
     }
   }
-  function attempt(u,next){
-    var x;
-    try{
-      x=new XMLHttpRequest();
-      x.onreadystatechange=function(){
-        if(x.readyState===4){
-          if(x.status>=200 && x.status<300){
-            try{
-              var e=parseDailyText(x.responseText,d);
-              if(e && e.scripture && e.ref && e.comment){
-                saveDaily(e);applyDaily(e);return;
-              }
-            }catch(ignore){}
-          }
-          if(next)next(); else finish();
-        }
-      };
-      x.open("GET",u,true);x.send(null);
-    }catch(err){if(next)next();else finish()}
-  }
-  attempt(url,function(){
-    attempt("https://r.jina.ai/"+url,function(){
-      attempt("https://api.allorigins.win/raw?url="+encodeURIComponent(url),null);
-    });
-  });
 }
 loadDaily();
 window.setInterval(loadDaily,1800000);
