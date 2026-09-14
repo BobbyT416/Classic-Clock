@@ -77,7 +77,7 @@ body{overflow:hidden}
     <button id="choosePhoto" type="button">Change Picture</button>
     <input id="photoInput" type="file" accept="image/*">
   </section>
-  <div id="version">v3.0</div>
+  <div id="version">v3.1</div>
 </div>
 <script>
 (function(){
@@ -102,8 +102,7 @@ function prettyDailyDate(d){
  return days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear();
 }
 var dailyFallbacks={
- "2026-09-09":{date:"2026-09-09",label:"Wednesday, September 9, 2026",scripture:"All Scripture is inspired of God and beneficial.",ref:"— 2 Timothy 3:16",comment:"All of God’s people receive the spiritual nourishment, direction, and protection they need. An example of Jehovah’s impartiality is that he makes the Bible accessible to people around the globe today. The Holy Scriptures were originally written in three languages: Hebrew, Aramaic, and Greek. Do those who can read the original Bible languages have a closer relationship with Jehovah than those who cannot? No, they do not. (Matt. 11:25) Jehovah’s approval of us is not dependent on our secular education or on our ability with languages. Rather than offer his wisdom only to the highly educated, Jehovah makes it accessible to people around the earth, whether they are highly educated or not. His inspired Word, the Bible, has been translated into thousands of languages; thus, people the world over can benefit from its teachings and learn how they can become his friends.—2 Tim. 3:16, 17."},
- "2026-09-10":{date:"2026-09-10",label:"Thursday, September 10, 2026",scripture:"The desolating of [Jerusalem] has drawn near.",ref:"— Luke 21:20",comment:"The destruction of the Jewish system of things, which Jesus had foretold, was approaching. Christians needed to use the time remaining to prepare themselves by building up such qualities as faith and endurance. (Heb. 10:25; 12:1, 2) We are about to face a tribulation far greater than the one experienced by the Hebrew Christians. (Matt. 24:21; Rev. 16:14, 16) Consider some of the practical counsel that Jehovah provided for those Christians that can benefit us too. The apostle Paul encouraged his fellow believers to dig deeper into God’s Word. (Heb. 5:14–6:1) Using the Hebrew Scriptures, Paul reasoned with his brothers on the superiority of the Christian way of worship over Judaism. Paul knew that increased knowledge and a deeper understanding of the truth would equip those Christians to identify and reject false reasonings so that they would not be led astray."}
+ "2026-09-14":{date:"2026-09-14",label:"Monday, September 14, 2026",scripture:"Unless you eat the flesh of the Son of man and drink his blood, you have no life in yourselves.",ref:"— John 6:53",comment:"Back in Noah’s day, God prohibited humans from consuming blood. (Gen. 9:3, 4) Jehovah repeated that restriction in his Law to Israel. Anyone eating blood was to “be put to death.” (Lev. 7:27, ftn.) Jesus upheld that Law. (Matt. 5:17-19) So it is unthinkable that he would urge a crowd of Jews to consume his actual flesh or drink the blood in his veins. Jesus was speaking in a figurative sense, as he had done earlier when he told a Samaritan woman: “The water that I will give . . . will . . . impart everlasting life.” (John 4:7, 14) Jesus was not suggesting that the Samaritan woman would get everlasting life simply by drinking certain literal water. Similarly, he was not saying that the crowds he spoke to in Capernaum would live forever if they ate his literal flesh and drank his literal blood."}
 };
 function applyDaily(e){
  document.getElementById("dailyDate").innerHTML=escapeHtml(e.label||"");
@@ -117,63 +116,42 @@ function saveDaily(e){setStorage("dailyTextCache",JSON.stringify(e))}
 function showDailyUnavailable(d){
  document.getElementById("dailyDate").innerHTML=escapeHtml(prettyDailyDate(d));
  document.getElementById("scripture").className="";
- document.getElementById("scripture").innerHTML="Trying to load today's Daily Text...";
+ document.getElementById("scripture").innerHTML="Daily Text unavailable";
  document.getElementById("dailyRef").innerHTML="";
- document.getElementById("comment").innerHTML="The dashboard will keep trying to retrieve today's text automatically.";
+ document.getElementById("comment").innerHTML="Connect to the internet and reload to retrieve today's Daily Text.";
 }
-function stripTags(s){return String(s||"").replace(/<br\s*\/?>(?=.)/gi," ").replace(/<[^>]*>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g," ").replace(/^\s+|\s+$/g,"")}
-function parseWolItem(item,today){
- if(!item)return null;
- var html=item.content||"";
- var dateText="";
- var h=html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
- if(h)dateText=stripTags(h[1]);
- var ps=html.match(/<p[^>]*>[\s\S]*?<\/p>/gi)||[];
- var cleaned=[];
- for(var i=0;i<ps.length;i++){var t=stripTags(ps[i]);if(t)cleaned.push(t)}
- var scripture="";
- var em=html.match(/<em[^>]*>([\s\S]*?)<\/em>/i);
- if(em)scripture=stripTags(em[1]);
- if(!scripture&&cleaned.length)scripture=cleaned[0];
- var comment="";
- if(cleaned.length>1)comment=cleaned.slice(1).join(" ");
- var ref="";
- var refm=scripture.match(/(?:—|-|–)\s*([^—–-]+)$/);
- if(refm){ref="— "+stripTags(refm[1]);scripture=scripture.replace(/\s*(?:—|-|–)\s*[^—–-]+$/,'').replace(/\s+$/,'')}
- if(!scripture||!comment)return null;
- return {date:today,label:dateText||prettyDailyDate(new Date(today.replace(/-/g,'/'))),scripture:scripture,ref:ref,comment:comment,url:item.url||"https://wol.jw.org/"};
+function applyDaily(e){
+ document.getElementById("dailyDate").innerHTML=escapeHtml(e.label||"");
+ document.getElementById("scripture").className="";
+ document.getElementById("scripture").innerHTML=escapeHtml(e.scripture||"");
+ document.getElementById("dailyRef").innerHTML=escapeHtml(e.ref||"");
+ document.getElementById("comment").innerHTML=escapeHtml(e.comment||"");
 }
-function tryJsonUrl(url,done){
- var x;
- try{x=new XMLHttpRequest();x.onreadystatechange=function(){if(x.readyState!==4)return;if(x.status>=200&&x.status<300){try{done(JSON.parse(x.responseText));return}catch(e){}}done(null)};x.open("GET",url,true);x.send(null)}catch(e){done(null)}
-}
+function getDailyCache(){var raw=getStorage("dailyTextCache");if(!raw)return null;try{return JSON.parse(raw)}catch(e){return null}}
+function saveDaily(e){setStorage("dailyTextCache",JSON.stringify(e))}
 function loadDaily(){
- var d=new Date(),today=isoDate(d),cached=getDailyCache(),fallback=dailyFallbacks[today];
- if(cached&&cached.date===today){applyDaily(cached)}else if(fallback){applyDaily(fallback)}else{showDailyUnavailable(d)}
- var wol="https://wol.jw.org/wol/dt/r1/lp-e/"+d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate();
- var done=false;
- function finish(e){if(done)return;done=true;if(e&&e.date===today){saveDaily(e);applyDaily(e);return}if(fallback){applyDaily(fallback);return}if(cached&&cached.date===today){applyDaily(cached);return}showDailyUnavailable(d)}
- tryJsonUrl(wol,function(data){
-   var e=null;
-   if(data&&data.items&&data.items.length)e=parseWolItem(data.items[0],today);
-   if(e){e.source="WOL";finish(e);return}
-   var proxy="https://r.jina.ai/"+wol;
-   tryJsonUrl(proxy,function(data2){
-     var e2=null;
-     if(data2&&data2.items&&data2.items.length)e2=parseWolItem(data2.items[0],today);
-     if(e2){e2.source="WOL";finish(e2);return}
-     var all="https://api.allorigins.win/raw?url="+encodeURIComponent(wol);
-     tryJsonUrl(all,function(data3){
-       var e3=null;
-       if(data3&&data3.items&&data3.items.length)e3=parseWolItem(data3.items[0],today);
-       finish(e3);
-     });
-   });
- });
+ var d=new Date(),today=isoDate(d),fallback=dailyFallbacks[today],cached=getDailyCache();
+ if(fallback){applyDaily(fallback);saveDaily(fallback)}
+ else if(cached&&cached.date===today){applyDaily(cached)}
+ else {showDailyUnavailable(d)}
+ try{
+  var x=new XMLHttpRequest();
+  x.onreadystatechange=function(){
+   if(x.readyState!==4)return;
+   if(x.status>=200&&x.status<300){
+    try{
+     var data=JSON.parse(x.responseText);
+     var e=data[today];
+     if(e){saveDaily(e);applyDaily(e);}
+    }catch(err){}
+   }
+  };
+  x.open("GET","dailytext.json?v="+today,true);
+  x.send(null);
+ }catch(e){}
 }
-
-
-loadDaily();window.setInterval(loadDaily,1800000);
+loadDaily();
+window.setInterval(loadDaily,3600000);
 
 var defaultScenes=[
  "data:image/svg+xml;charset=utf-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop stop-color='#274f73'/><stop offset='.48' stop-color='#071a2d'/><stop offset='1' stop-color='#02070d'/></linearGradient></defs><rect width='1600' height='1000' fill='url(#g)'/><circle cx='1250' cy='300' r='120' fill='#ffd68a' opacity='.85'/><path d='M0 650 L330 360 L520 580 L850 300 L1600 680 L1600 1000 L0 1000Z' fill='#071321'/><path d='M0 760 L350 560 L620 700 L980 500 L1600 760 L1600 1000 L0 1000Z' fill='#0b2134'/></svg>"),
